@@ -1,21 +1,37 @@
 <!doctype html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#ffffff">
     <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
-	<link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/apple-touch-icon.png">
-	<link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/favicon-32x32.png">
-	<link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/favicon-16x16.png">
-	<link rel="manifest" href="%PUBLIC_URL%/manifest.json">
-	<link rel="mask-icon" href="%PUBLIC_URL%/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/favicon-16x16.png">
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
+    <link rel="mask-icon" href="%PUBLIC_URL%/safari-pinned-tab.svg" color="#5bbad5">
     <title>ROUTE66 - Auto Repair Shop</title>
-  </head>
-  <body>
+</head>
+
+<body>
     <noscript>
       You need to enable JavaScript to run this app.
     </noscript>
     <div id="root">Loading, please wait...</div>
-  </body>
+    <script src="https://www.gstatic.com/firebasejs/4.3.1/firebase.js"></script>
+    <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyDa_YV_ULephd6M_F0fcx4uuVi5IvECHDY",
+            authDomain: "route66-ars.firebaseapp.com",
+            databaseURL: "https://route66-ars.firebaseio.com",
+            projectId: "route66-ars",
+            storageBucket: "route66-ars.appspot.com",
+            messagingSenderId: "219060073910"
+        };
+        firebase.initializeApp(config);
+    </script>
+</body>
+
 </html>
