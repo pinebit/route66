@@ -5,6 +5,13 @@ const firebaseUser = PropTypes.shape({
   displayName: PropTypes.string,
 });
 
+const userRecord = PropTypes.shape({
+  uid: PropTypes.string.isRequired,
+  role: PropTypes.number.isRequired,
+});
+
 export {
   firebaseUser,
+  userRecord,
 };
+

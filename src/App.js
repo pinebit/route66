@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Switch, Route, withRouter } from 'react-router-dom';
 import { Container } from 'semantic-ui-react';
 import firebase from './firebase';
@@ -50,5 +51,10 @@ class App extends Component {
     );
   }
 }
+
+App.propTypes = {
+  history: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  children: PropTypes.node.isRequired,
+};
 
 export default withRouter(App);

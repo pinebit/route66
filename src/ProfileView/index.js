@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import {
   Segment,
   Header,
@@ -7,28 +7,28 @@ import {
   Form,
   Message,
   Button,
-  Popup
-} from 'semantic-ui-react'
-import CenteredForm from '../CenteredForm'
-import Gravatar from 'react-gravatar'
-import firebase from '../firebase'
+  Popup,
+} from 'semantic-ui-react';
+import Gravatar from 'react-gravatar';
+import CenteredForm from '../CenteredForm';
+import firebase from '../firebase';
 
 const ProfilePicture = () => {
-  const user = firebase.auth().currentUser
+  const user = firebase.auth().currentUser;
 
   return (
-    <Image shape='rounded' spaced verticalAlign='top'>
+    <Image shape="rounded" spaced verticalAlign="top">
       <Gravatar email={user.email} size={128} />
     </Image>
-  )
-}
+  );
+};
 
 class ProfileView extends React.PureComponent {
   state = {
     name: firebase.auth().currentUser.displayName || '',
     error: false,
     success: false,
-    updating: false
+    updating: false,
   };
 
   onDisplayNameUpdate = () => {
@@ -36,89 +36,103 @@ class ProfileView extends React.PureComponent {
       ...this.state,
       updating: true,
       error: false,
-      success: false
-    })
+      success: false,
+    });
 
     firebase.auth().currentUser.updateProfile({
-      displayName: this.state.name
+      displayName: this.state.name,
     })
-    .then(() => {
-      this.setState({
-        ...this.state,
-        updating: false,
-        success: true
+      .then(() => {
+        this.setState({
+          ...this.state,
+          updating: false,
+          success: true,
+        });
       })
-    })
-    .catch(() => {
-      this.setState({
-        ...this.state,
-        updating: false,
-        error: true
-      })
-    })
+      .catch(() => {
+        this.setState({
+          ...this.state,
+          updating: false,
+          error: true,
+        });
+      });
   };
 
-  onDisplayNameChange = e => {
+  onDisplayNameChange = (e) => {
     this.setState({
       ...this.state,
-      name: e.target.value
-    })
+      name: e.target.value,
+    });
   };
 
-  render () {
-    const user = firebase.auth().currentUser
-    const canUpdate = user.displayName !== this.state.name && this.state.name.length > 0
+  render() {
+    const user = firebase.auth().currentUser;
+    const canUpdate = user.displayName !== this.state.name && this.state.name.length > 0;
 
     return (
       <CenteredForm>
-        <Header as='h2' attached='top' block content='Profile' />
-        <Segment attached textAlign='left'>
+        <Header as="h2" attached="top" block content="Profile" />
+        <Segment attached textAlign="left">
           <Segment secondary>
             <ProfilePicture />
-            <Label as='a' color='blue' content='gravatar.com' href='https://gravatar.com' tag />
+            <Label as="a" color="blue" content="gravatar.com" href="https://gravatar.com" tag />
           </Segment>
-          <Form success={this.state.success}
+          <Form
+            success={this.state.success}
             error={this.state.error}
-            loading={this.state.updating}>
-            <Popup trigger={
-              <Form.Input
-                error={!user.emailVerified}
-                fluid
-                icon='at'
-                iconPosition='left'
-                placeholder='E-mail address'
-                type='email'
-                readOnly
-                value={user.email} />
-            }
-              content='You cannot modify the e-mail address.' />
-            <Message error
+            loading={this.state.updating}
+          >
+            <Popup
+              trigger={
+                <Form.Input
+                  error={!user.emailVerified}
+                  fluid
+                  icon="at"
+                  iconPosition="left"
+                  placeholder="E-mail address"
+                  type="email"
+                  readOnly
+                  value={user.email}
+                />
+              }
+              content="You cannot modify the e-mail address."
+            />
+            <Message
+              error
               visible={!user.emailVerified}
-              content='You have not verified this e-mail address yet.' />
+              content="You have not verified this e-mail address yet."
+            />
             <Form.Input
               fluid
-              icon='user'
-              iconPosition='left'
-              placeholder='Display Name'
+              icon="user"
+              iconPosition="left"
+              placeholder="Display Name"
               autoFocus
               value={this.state.name}
-              onChange={this.onDisplayNameChange} />
-            <Button fluid
+              onChange={this.onDisplayNameChange}
+            />
+            <Button
+              fluid
               primary
-              type='submit'
+              type="submit"
               onClick={this.onDisplayNameUpdate}
-              disabled={!canUpdate}>
+              disabled={!canUpdate}
+            >
               Update
             </Button>
-            <Message error
-              content='Failed to update. Please try again.' />
-            <Message success
-              content='Profile updated.' />
+            <Message
+              error
+              content="Failed to update. Please try again."
+            />
+            <Message
+              success
+              content="Profile updated."
+            />
           </Form>
         </Segment>
       </CenteredForm>
-    )
+    );
   }
 }
 
-export default ProfileView
+export default ProfileView;
