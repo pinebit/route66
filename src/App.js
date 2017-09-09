@@ -1,17 +1,54 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react';
+import { Switch, Route, withRouter } from 'react-router-dom';
+import { Container } from 'semantic-ui-react';
+import firebase from './firebase';
+import AppMenu from './AppMenu';
+import PrivateRoute from './PrivateRoute';
+import SignInForm from './SignInForm';
+import SignUpForm from './SignUpForm';
+import SignOutForm from './SignOutForm';
+import ProfileView from './ProfileView';
+import RepairsView from './RepairsView';
+import UsersView from './UsersView';
 
-const App = () => (
-  <div className="App">
-    <div className="App-header">
-      <img src={logo} className="App-logo" alt="logo" />
-      <h2 > Welcome to React </h2>
-    </div>
-    <p className="App-intro">
-            To get started, edit <code > src / App.js </code> and save to reload.
-    </p>
-  </div>
-);
+class App extends Component {
+  state = {
+    user: null,
+  }
 
-export default App;
+  componentDidMount() {
+    firebase.auth().onAuthStateChanged(this.onAuthStateChanged);
+  }
+
+  onAuthStateChanged = (user) => {
+    this.setState({
+      ...this.state,
+      user,
+    });
+
+    if (user) {
+      this.props.history.push('/log');
+    }
+  };
+
+  render() {
+    return (
+      <div style={{ minWidth: 1300 }}>
+        <AppMenu user={this.state.user} />
+        <Container>
+          {this.props.children}
+        </Container>
+        <Switch>
+          <Route exact path="/signin" component={SignInForm} />
+          <Route exact path="/signup" component={SignUpForm} />
+          <Route exact path="/signout" component={SignOutForm} />
+          <PrivateRoute path="/repairs" component={RepairsView} />
+          <PrivateRoute path="/users" component={UsersView} />
+          <PrivateRoute path="/profile" component={ProfileView} />
+        </Switch>
+      </div>
+    );
+  }
+}
+
+export default withRouter(App);
