@@ -17,7 +17,7 @@ https://route66-ars.firebaseapp.com
 
 The following specification has been provided by Toptal:
 
->Task: Write an application that helps run a small auto repair shop.
+> Task: Write an application that helps run a small auto repair shop.
 - The application must be React-based.
 - Users must be able to create an account and log in.
 - Include at least 2 user roles: Manager and User.

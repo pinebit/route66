@@ -1,8 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
+import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
+import firebase from './firebase';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+console.log('firebase initialized', firebase.app().name);
+
+ReactDOM.render(
+  (
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  ),
+  document.getElementById('root'),
+);
+
 registerServiceWorker();

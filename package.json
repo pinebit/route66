@@ -1,11 +1,22 @@
 {
     "name": "route66",
+    "description": "ROUTE66 - Car Repair Shop application",
+    "author": {
+        "email": "andrei.smirnov@toptal.com",
+        "name": "Andrei Smirnov"
+    },
     "version": "0.1.0",
     "private": true,
     "dependencies": {
+        "prop-types": "^15.5.10",
         "react": "^15.6.1",
         "react-dom": "^15.6.1",
-        "react-scripts": "1.0.13"
+        "react-gravatar": "^2.6.3",
+        "react-router": "^4.2.0",
+        "react-router-dom": "^4.2.2",
+        "react-scripts": "1.0.13",
+        "semantic-ui-calendar": "0.0.8",
+        "semantic-ui-react": "^0.72.0"
     },
     "scripts": {
         "start": "react-scripts start",
