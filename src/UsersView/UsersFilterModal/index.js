@@ -65,19 +65,20 @@ class UsersFilterModal extends React.PureComponent {
       ...this.state,
       filter: {
         ...this.state.filter,
-        state: data.value,
+        disabled: data.value,
       },
     });
   }
 
   stateOptions = [
     { text: 'Any', value: '*' },
-    { text: 'Enabled', value: 'true' },
-    { text: 'Disabled', value: 'false' },
+    { text: 'Enabled', value: 'false' },
+    { text: 'Disabled', value: 'true' },
   ]
 
   roleOptions = [
     { text: 'Any', value: '*' },
+    { text: 'Admin', value: 'admin' },
     { text: 'Manager', value: 'manager' },
     { text: 'User', value: 'user' },
   ]
@@ -100,6 +101,7 @@ class UsersFilterModal extends React.PureComponent {
         <Modal.Content>
           <Form>
             <Form.Input
+              autoFocus
               label="Filter by Name"
               placeholder="Leave blank to not filter by Name"
               value={this.state.filter.name}
@@ -120,13 +122,13 @@ class UsersFilterModal extends React.PureComponent {
             <Form.Select
               label="State"
               options={this.stateOptions}
-              value={this.state.filter.state}
+              value={this.state.filter.disabled}
               onChange={this.onStateChanged}
             />
           </Form>
         </Modal.Content>
         <Modal.Actions>
-          <Button content="Reset" color="brown" floated="left" disabled={!this.props.filtering} onClick={this.onReset} />
+          <Button content="Reset Filter" color="brown" floated="left" disabled={!this.props.filtering} onClick={this.onReset} />
           <Button content="Cancel" onClick={this.onClose} />
           <Button icon="check" primary content="Apply" onClick={this.onApply} />
         </Modal.Actions>
@@ -141,7 +143,7 @@ UsersFilterModal.propTypes = {
     name: PropTypes.string,
     email: PropTypes.string,
     role: PropTypes.string,
-    state: PropTypes.string,
+    disabled: PropTypes.string,
   }).isRequired,
   onFilterChange: PropTypes.func.isRequired,
 };

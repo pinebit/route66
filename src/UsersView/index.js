@@ -15,7 +15,7 @@ class UsersView extends React.PureComponent {
     name: '',
     email: '',
     role: '*',
-    state: '*',
+    disabled: '*',
   }
 
   state = {
@@ -81,15 +81,46 @@ class UsersView extends React.PureComponent {
     });
   }
 
-  updateUser = (user) => {
-    firebase.database().ref(`users/${user.uid}`).update(user);
-  };
+  onResetFilter = (e) => {
+    e.preventDefault();
+    this.onFilterChange(null);
+  }
 
   closeConfirm = () => {
     this.setState({
       ...this.state,
       confirm: null,
     });
+  }
+
+  updateUser = (user) => {
+    firebase.database().ref(`users/${user.uid}`).update(user);
+  };
+
+  usersFilter = (user) => {
+    if (!this.state.filtering) {
+      return true;
+    }
+
+    if (this.state.filter.disabled !== '*' && Boolean(this.state.filter.disabled) !== user.disabled) {
+      return false;
+    }
+
+    if (this.state.filter.role !== '*' && this.state.filter.role !== user.role) {
+      return false;
+    }
+
+    if (this.state.filter.name !== '' &&
+      user.name.toUpperCase().indexOf(this.state.filter.name.toUpperCase()) < 0) {
+      return false;
+    }
+
+    if (this.state.filter.email !== '' &&
+      user.email.toUpperCase().indexOf(this.state.filter.email.toUpperCase()) < 0) {
+      return false;
+    }
+
+    return true;
   }
 
   renderActions = user => (
@@ -108,10 +139,12 @@ class UsersView extends React.PureComponent {
   );
 
   render() {
+    const users = this.state.users ? this.state.users.filter(this.usersFilter) : [];
+
     return (
       <div>
         <Header as="h3" attached="top" block color={this.state.filtering ? 'blue' : undefined}>
-          Users ({this.state.users ? this.state.users.length : '-'})
+          Users ({users.length})
           <UsersFilterModal
             filtering={this.state.filtering}
             filter={this.state.filter}
@@ -132,7 +165,7 @@ class UsersView extends React.PureComponent {
                 </Table.Row>
               </Table.Header>
               <Table.Body>
-                {this.state.users.map(user => (
+                {users.map(user => (
                   <Table.Row key={user.uid}>
                     <Table.Cell>{user.name}</Table.Cell>
                     <Table.Cell>{user.email}</Table.Cell>
@@ -141,6 +174,13 @@ class UsersView extends React.PureComponent {
                     <Table.Cell>{user.role !== 'admin' && this.renderActions(user)}</Table.Cell>
                   </Table.Row>
                 ))}
+                {users.length === 0 &&
+                  <Table.Row>
+                    <Table.Cell>
+                      No records found. {this.state.filtering && <a href="" onClick={this.onResetFilter}>Reset Filter</a>}
+                    </Table.Cell>
+                  </Table.Row>
+                }
               </Table.Body>
             </Table>
           }
