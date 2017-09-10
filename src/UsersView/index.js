@@ -8,7 +8,7 @@ import {
   Dropdown,
 } from 'semantic-ui-react';
 import UsersFilterModal from './UsersFilterModal';
-import firebase from '../firebase';
+import firebase, { readArrayAsync } from '../firebase';
 
 class UsersView extends React.PureComponent {
   static DefaultFilter = {
@@ -26,11 +26,8 @@ class UsersView extends React.PureComponent {
   }
 
   componentDidMount() {
-    firebase.database().ref('users').on('value', (snapshot) => {
-      const data = snapshot.val();
-      const keys = Object.keys(data);
-      const users = keys.map(key => data[key]);
-
+    // reading users
+    readArrayAsync('users', (users) => {
       this.setState({
         ...this.state,
         users,

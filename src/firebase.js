@@ -14,3 +14,18 @@ firebase.initializeApp(config);
 
 export default firebase;
 
+function readArrayAsync(store, callback) {
+  firebase.database().ref(store).on('value', (snapshot) => {
+    const data = snapshot.val();
+    let records = [];
+    if (data) {
+      const keys = Object.keys(data);
+      records = keys.map(key => ({ key, ...data[key] }));
+    }
+    callback(records);
+  });
+}
+
+export {
+  readArrayAsync,
+};
