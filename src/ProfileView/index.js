@@ -2,127 +2,84 @@ import React from 'react';
 import {
   Segment,
   Header,
-  Image,
   Label,
   Form,
   Message,
-  Button,
-  Popup,
 } from 'semantic-ui-react';
-import Gravatar from 'react-gravatar';
 import CenteredForm from '../CenteredForm';
 import firebase from '../firebase';
-
-const ProfilePicture = () => {
-  const user = firebase.auth().currentUser;
-
-  return (
-    <Image shape="rounded" spaced verticalAlign="top">
-      <Gravatar email={user.email} size={128} />
-    </Image>
-  );
-};
+import ProfilePicture from './ProfilePicture';
 
 class ProfileView extends React.PureComponent {
   state = {
-    name: firebase.auth().currentUser.displayName || '',
+    user: {
+      name: '',
+      email: '',
+    },
+    loading: true,
     error: false,
-    success: false,
-    updating: false,
   };
 
-  onDisplayNameUpdate = () => {
-    this.setState({
-      ...this.state,
-      updating: true,
-      error: false,
-      success: false,
-    });
-
-    firebase.auth().currentUser.updateProfile({
-      displayName: this.state.name,
-    })
-      .then(() => {
-        this.setState({
-          ...this.state,
-          updating: false,
-          success: true,
+  componentDidMount() {
+    const user = firebase.auth().currentUser;
+    if (user) {
+      firebase.database().ref(`users/${user.uid}`).once('value')
+        .then((snapshot) => {
+          this.setState({
+            ...this.state,
+            user: snapshot.val(),
+            loading: false,
+          });
+        })
+        .catch(() => {
+          this.setState({
+            ...this.state,
+            loading: false,
+            error: true,
+          });
         });
-      })
-      .catch(() => {
-        this.setState({
-          ...this.state,
-          updating: false,
-          error: true,
-        });
-      });
-  };
-
-  onDisplayNameChange = (e) => {
-    this.setState({
-      ...this.state,
-      name: e.target.value,
-    });
-  };
+    }
+  }
 
   render() {
-    const user = firebase.auth().currentUser;
-    const canUpdate = user.displayName !== this.state.name && this.state.name.length > 0;
-
     return (
       <CenteredForm>
         <Header as="h2" attached="top" block content="Profile" />
         <Segment attached textAlign="left">
           <Segment secondary>
             <ProfilePicture />
-            <Label as="a" color="blue" content="gravatar.com" href="https://gravatar.com" tag />
+            <Label color="green" content={this.state.user.role} tag />
+            <Message>
+              Use <a href="https://gravatar.com">gravatar.com</a> to update your picture profile.
+            </Message>
           </Segment>
-          <Form
-            success={this.state.success}
-            error={this.state.error}
-            loading={this.state.updating}
-          >
-            <Popup
-              trigger={
-                <Form.Input
-                  error={!user.emailVerified}
-                  fluid
-                  icon="at"
-                  iconPosition="left"
-                  placeholder="E-mail address"
-                  type="email"
-                  readOnly
-                  value={user.email}
-                />
-              }
-              content="You cannot modify the e-mail address."
-            />
+          <Form loading={this.state.loading} error={this.state.error}>
             <Form.Input
               fluid
               icon="user"
               iconPosition="left"
-              placeholder="Display Name"
-              autoFocus
-              value={this.state.name}
-              onChange={this.onDisplayNameChange}
+              placeholder="Name"
+              readOnly
+              value={this.state.user.name}
             />
-            <Button
+            <Form.Input
               fluid
-              primary
-              type="submit"
-              onClick={this.onDisplayNameUpdate}
-              disabled={!canUpdate}
-            >
-              Update
-            </Button>
+              icon="mail"
+              iconPosition="left"
+              placeholder="E-mail"
+              readOnly
+              value={this.state.user.email}
+            />
             <Message
               error
-              content="Failed to update. Please try again."
+              content="Failed to retreive your profile data."
             />
-            <Message
-              success
-              content="Profile updated."
-            />
+            <Form.Button disabled fluid>
+              Disable Account
+            </Form.Button>
+            <Form.Button disabled fluid>
+              Change Password
+            </Form.Button>
           </Form>
         </Segment>
       </CenteredForm>

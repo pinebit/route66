@@ -13,6 +13,7 @@ import logoIcon from '../img/logo.svg';
 
 class SignUpForm extends React.Component {
   state = {
+    name: '',
     email: '',
     password: '',
     loading: false,
@@ -49,8 +50,9 @@ class SignUpForm extends React.Component {
   registerNewUser = (user) => {
     const userData = {
       uid: user.uid,
-      name: this.state.email.split('@')[0],
+      name: this.state.name,
       email: this.state.email,
+      disabled: false,
       role: 'user',
     };
 
@@ -58,7 +60,7 @@ class SignUpForm extends React.Component {
   }
 
   render() {
-    const canSubmit = this.state.email.length > 0 && this.state.password.length > 0;
+    const canSubmit = this.state.name && this.state.email && this.state.password;
 
     return (
       <CenteredForm>
@@ -71,6 +73,16 @@ class SignUpForm extends React.Component {
         />
         <Segment attached>
           <Form loading={this.state.loading} error={this.state.error !== null}>
+            <Form.Input
+              fluid
+              autoFocus
+              icon="user"
+              iconPosition="left"
+              placeholder="Name"
+              value={this.state.name}
+              required
+              onChange={e => this.onFieldChange('name', e)}
+            />
             <Form.Input
               fluid
               icon="at"

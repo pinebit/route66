@@ -1,5 +1,13 @@
 import React from 'react';
-import { Header, Table, Button, Segment, Loader, Confirm } from 'semantic-ui-react';
+import {
+  Header,
+  Table,
+  Button,
+  Segment,
+  Loader,
+  Confirm,
+  Dropdown,
+} from 'semantic-ui-react';
 import firebase from '../firebase';
 
 class UsersView extends React.PureComponent {
@@ -17,6 +25,7 @@ class UsersView extends React.PureComponent {
       this.setState({
         ...this.state,
         users,
+        confirm: null,
       });
     });
   }
@@ -25,19 +34,38 @@ class UsersView extends React.PureComponent {
     firebase.database().ref('users').off('value');
   }
 
-  onDelete = (uid) => {
+  onDisable = (user) => {
     this.setState({
       ...this.state,
       confirm: {
-        content: 'Do you want to delete the user?',
-        action: () => this.onDeleteConfirmed(uid),
+        content: `Do you want to disable ${user.name} account?`,
+        action: () => this.updateUser({ ...user, disabled: true }),
       },
     });
   }
 
-  onDeleteConfirmed = (uid) => {
-    this.closeConfirm();
-    firebase.database().ref(`users/${uid}`).remove();
+  onEnable = (user) => {
+    this.setState({
+      ...this.state,
+      confirm: {
+        content: `Do you want to enable ${user.name} account?`,
+        action: () => this.updateUser({ ...user, disabled: false }),
+      },
+    });
+  }
+
+  onPromote = (user) => {
+    this.setState({
+      ...this.state,
+      confirm: {
+        content: `Do you want ${user.name} to become a Manager?`,
+        action: () => this.updateUser({ ...user, role: 'manager' }),
+      },
+    });
+  }
+
+  updateUser = (user) => {
+    firebase.database().ref(`users/${user.uid}`).update(user);
   };
 
   closeConfirm = () => {
@@ -46,6 +74,21 @@ class UsersView extends React.PureComponent {
       confirm: null,
     });
   }
+
+  renderActions = user => (
+    <Dropdown item text="Actions">
+      <Dropdown.Menu>
+        {user.disabled ?
+          <Dropdown.Item onClick={() => this.onEnable(user)}>Enable</Dropdown.Item>
+          :
+          <Dropdown.Item onClick={() => this.onDisable(user)}>Disable</Dropdown.Item>
+        }
+        {user.role === 'user' &&
+          <Dropdown.Item onClick={() => this.onPromote(user)}>Promote to Manager</Dropdown.Item>
+        }
+      </Dropdown.Menu>
+    </Dropdown>
+  );
 
   render() {
     return (
@@ -63,6 +106,7 @@ class UsersView extends React.PureComponent {
                   <Table.HeaderCell>Name</Table.HeaderCell>
                   <Table.HeaderCell>E-mail</Table.HeaderCell>
                   <Table.HeaderCell>Role</Table.HeaderCell>
+                  <Table.HeaderCell>State</Table.HeaderCell>
                   <Table.HeaderCell>Actions</Table.HeaderCell>
                 </Table.Row>
               </Table.Header>
@@ -72,18 +116,8 @@ class UsersView extends React.PureComponent {
                     <Table.Cell>{user.name}</Table.Cell>
                     <Table.Cell>{user.email}</Table.Cell>
                     <Table.Cell>{user.role}</Table.Cell>
-                    <Table.Cell>
-                      {user.role !== 'admin' &&
-                        <Button color="red" compact onClick={() => this.onDelete(user.uid)}>
-                          Delete
-                        </Button>
-                      }
-                      {user.role === 'user' &&
-                        <Button color="brown" compact>
-                          Promote to Manager
-                        </Button>
-                      }
-                    </Table.Cell>
+                    <Table.Cell>{user.disabled ? 'Disabled' : 'Enabled'}</Table.Cell>
+                    <Table.Cell>{user.role !== 'admin' && this.renderActions(user)}</Table.Cell>
                   </Table.Row>
                 ))}
               </Table.Body>
