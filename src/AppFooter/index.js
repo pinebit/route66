@@ -6,9 +6,11 @@ const AndreiSmirnovLink = () => (
 );
 
 const AppFooter = () => (
-  <Header as="p" floated="right" color="grey" size="tiny">
-    <pre>Developed by <AndreiSmirnovLink /> for Toptal React Academy.</pre>
-  </Header>
+  <div style={{ marginTop: '1em' }}>
+    <Header as="h6" floated="right" color="grey" size="tiny" sub>
+      Developed by <AndreiSmirnovLink /> for Toptal React Academy.
+    </Header>
+  </div>
 );
 
 export default AppFooter;

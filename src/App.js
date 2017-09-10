@@ -16,6 +16,8 @@ import './App.css';
 class App extends Component {
   state = {
     user: null,
+    users: [],
+    repairs: [],
   }
 
   componentDidMount() {
@@ -23,13 +25,15 @@ class App extends Component {
   }
 
   onAuthStateChanged = (user) => {
+    const loggedIn = !this.state.user && user;
+
     this.setState({
       ...this.state,
       user,
     });
 
-    if (user) {
-      this.props.history.push('/log');
+    if (loggedIn) {
+      this.props.history.push('/repairs');
     }
   };
 

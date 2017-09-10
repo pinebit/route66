@@ -6,19 +6,18 @@ import firebase from '../firebase';
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <Route
     {...rest}
-    render={props => (
+    render={renderProps => (
       firebase.auth().currentUser ? (
-        <Component {...props} />
+        <Component {...renderProps} />
       ) : (
-        <Redirect to={{ pathname: '/signin', state: { from: props.location } }} />
+        <Redirect to={{ pathname: '/signin', state: { from: renderProps.location } }} />
       )
     )}
   />
 );
 
 PrivateRoute.propTypes = {
-  component: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
-  location: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  component: PropTypes.func.isRequired,
 };
 
 export default PrivateRoute;

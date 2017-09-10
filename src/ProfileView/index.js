@@ -97,11 +97,6 @@ class ProfileView extends React.PureComponent {
               }
               content="You cannot modify the e-mail address."
             />
-            <Message
-              error
-              visible={!user.emailVerified}
-              content="You have not verified this e-mail address yet."
-            />
             <Form.Input
               fluid
               icon="user"

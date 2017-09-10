@@ -22,7 +22,7 @@ MenuLink.defaultProps = {
 MenuLink.propTypes = {
   to: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
-  location: PropTypes.string.isRequired,
+  location: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
   visible: PropTypes.bool,
 };
 

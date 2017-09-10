@@ -28,7 +28,7 @@ class SignInForm extends React.Component {
   };
 
   navigateToLog = () => {
-    this.props.history.push('/log');
+    this.props.history.push('/repairs');
   };
 
   handleSignIn = () => {

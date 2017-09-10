@@ -7,6 +7,8 @@ const firebaseUser = PropTypes.shape({
 
 const userRecord = PropTypes.shape({
   uid: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  email: PropTypes.string.isRequired,
   role: PropTypes.number.isRequired,
 });
 

@@ -34,6 +34,9 @@ class SignUpForm extends React.Component {
     });
 
     firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password)
+      .then((user) => {
+        this.registerNewUser(user);
+      })
       .catch((error) => {
         this.setState({
           ...this.state,
@@ -42,6 +45,17 @@ class SignUpForm extends React.Component {
         });
       }, this);
   };
+
+  registerNewUser = (user) => {
+    const userData = {
+      uid: user.uid,
+      name: this.state.email.split('@')[0],
+      email: this.state.email,
+      role: 'user',
+    };
+
+    return firebase.database().ref(`/users/${user.uid}`).set(userData);
+  }
 
   render() {
     const canSubmit = this.state.email.length > 0 && this.state.password.length > 0;
