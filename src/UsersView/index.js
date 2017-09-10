@@ -2,18 +2,27 @@ import React from 'react';
 import {
   Header,
   Table,
-  Button,
   Segment,
   Loader,
   Confirm,
   Dropdown,
 } from 'semantic-ui-react';
+import UsersFilterModal from './UsersFilterModal';
 import firebase from '../firebase';
 
 class UsersView extends React.PureComponent {
+  static DefaultFilter = {
+    name: '',
+    email: '',
+    role: '*',
+    state: '*',
+  }
+
   state = {
     users: null,
     confirm: null,
+    filter: UsersView.DefaultFilter,
+    filtering: false,
   }
 
   componentDidMount() {
@@ -64,6 +73,14 @@ class UsersView extends React.PureComponent {
     });
   }
 
+  onFilterChange = (filter) => {
+    this.setState({
+      ...this.state,
+      filter: filter || UsersView.DefaultFilter,
+      filtering: !!filter,
+    });
+  }
+
   updateUser = (user) => {
     firebase.database().ref(`users/${user.uid}`).update(user);
   };
@@ -93,9 +110,13 @@ class UsersView extends React.PureComponent {
   render() {
     return (
       <div>
-        <Header as="h3" attached="top" block>
+        <Header as="h3" attached="top" block color={this.state.filtering ? 'blue' : undefined}>
           Users ({this.state.users ? this.state.users.length : '-'})
-          <Button floated="right" compact>Filter</Button>
+          <UsersFilterModal
+            filtering={this.state.filtering}
+            filter={this.state.filter}
+            onFilterChange={this.onFilterChange}
+          />
         </Header>
         <Segment attached>
           {this.state.users === null
