@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Switch, Route, withRouter } from 'react-router-dom';
-import { Container } from 'semantic-ui-react';
 import firebase from './firebase';
 import AppMenu from './AppMenu';
 import PrivateRoute from './PrivateRoute';
@@ -11,6 +10,8 @@ import SignOutForm from './SignOutForm';
 import ProfileView from './ProfileView';
 import RepairsView from './RepairsView';
 import UsersView from './UsersView';
+import AppFooter from './AppFooter';
+import './App.css';
 
 class App extends Component {
   state = {
@@ -34,11 +35,8 @@ class App extends Component {
 
   render() {
     return (
-      <div style={{ minWidth: 1300 }}>
+      <div className="app">
         <AppMenu user={this.state.user} />
-        <Container>
-          {this.props.children}
-        </Container>
         <Switch>
           <Route exact path="/signin" component={SignInForm} />
           <Route exact path="/signup" component={SignUpForm} />
@@ -47,6 +45,7 @@ class App extends Component {
           <PrivateRoute path="/users" component={UsersView} />
           <PrivateRoute path="/profile" component={ProfileView} />
         </Switch>
+        <AppFooter />
       </div>
     );
   }
@@ -54,7 +53,6 @@ class App extends Component {
 
 App.propTypes = {
   history: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
-  children: PropTypes.node.isRequired,
 };
 
 export default withRouter(App);
