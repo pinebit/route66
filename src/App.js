@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Switch, Route, withRouter } from 'react-router-dom';
+import 'react-dates/lib/css/_datepicker.css';
 import firebase from './firebase';
 import AppMenu from './AppMenu';
 import PrivateRoute from './PrivateRoute';

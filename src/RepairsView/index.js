@@ -7,6 +7,7 @@ import {
   Confirm,
   Dropdown,
 } from 'semantic-ui-react';
+import moment from 'moment';
 import EditRepairModal from './EditRepairModal';
 import firebase, { readArrayAsync } from '../firebase';
 
@@ -34,7 +35,7 @@ class RepairsView extends React.PureComponent {
     readArrayAsync('repairs', (repairs) => {
       this.setState({
         ...this.state,
-        repairs,
+        repairs: this.convertRepairs(repairs),
         confirm: null,
       });
     });
@@ -82,15 +83,28 @@ class RepairsView extends React.PureComponent {
     return false;
   }
 
+  convertRepairs = repairs =>
+    repairs
+      .map(repair => ({ ...repair, date: moment(repair.date) }))
+      .sort((a, b) => a.date > b.date);
+
   renderActions = repair => (
     <Dropdown item text="Actions">
       <Dropdown.Menu>
-        {repair.status === 'New' && <Dropdown.Item>Complete</Dropdown.Item>}
-        {repair.status === 'Complete' && <Dropdown.Item>Approve</Dropdown.Item>}
-        {repair.status === 'New' && this.state.user.role !== 'user' && <Dropdown.Item>Assign User</Dropdown.Item>}
+        {repair.state === 'assigned' && <Dropdown.Item>Complete</Dropdown.Item>}
+        {repair.state === 'complete' && <Dropdown.Item>Approve</Dropdown.Item>}
+        {repair.state === 'new' && this.state.user.role !== 'user' && <Dropdown.Item>Assign User</Dropdown.Item>}
       </Dropdown.Menu>
     </Dropdown>
   );
+
+  renderUser = (uid) => {
+    const user = this.state.users.find(u => u.key === uid);
+    if (!user) {
+      return '-';
+    }
+    return user.name;
+  }
 
   render() {
     const repairs = this.state.repairs ? this.state.repairs.filter(this.repairsFilter) : [];
@@ -99,7 +113,7 @@ class RepairsView extends React.PureComponent {
       <div>
         <Header as="h3" attached="top" block color={this.state.filtering ? 'blue' : undefined}>
           Repairs ({repairs.length})
-          {this.state.user.role !== 'user' && <EditRepairModal createMode />}
+          {this.state.user.role !== 'user' && <EditRepairModal createMode users={this.state.users} />}
         </Header>
         <Segment attached>
           {this.state.repairs === null
@@ -109,7 +123,7 @@ class RepairsView extends React.PureComponent {
                 <Table.Row>
                   <Table.HeaderCell>Date</Table.HeaderCell>
                   <Table.HeaderCell>Time</Table.HeaderCell>
-                  <Table.HeaderCell>Repair</Table.HeaderCell>
+                  <Table.HeaderCell>Description</Table.HeaderCell>
                   <Table.HeaderCell>User</Table.HeaderCell>
                   <Table.HeaderCell>State</Table.HeaderCell>
                   <Table.HeaderCell>Comments</Table.HeaderCell>
@@ -119,13 +133,13 @@ class RepairsView extends React.PureComponent {
               <Table.Body>
                 {repairs.map(repair => (
                   <Table.Row key={repair.key}>
-                    <Table.Cell>{repair.date}</Table.Cell>
-                    <Table.Cell>{repair.time}</Table.Cell>
-                    <Table.Cell>{repair.repair}</Table.Cell>
-                    <Table.Cell>{repair.user}</Table.Cell>
+                    <Table.Cell>{repair.date.format('DD MMM YYYY')}</Table.Cell>
+                    <Table.Cell>{repair.date.format('h:mmA')}</Table.Cell>
+                    <Table.Cell>{repair.description}</Table.Cell>
+                    <Table.Cell>{this.renderUser(repair.uid)}</Table.Cell>
                     <Table.Cell>{repair.state}</Table.Cell>
                     <Table.Cell>{repair.comments}</Table.Cell>
-                    <Table.Cell>{this.renderActionsr(repair)}</Table.Cell>
+                    <Table.Cell>{this.renderActions(repair)}</Table.Cell>
                   </Table.Row>
                 ))}
                 {repairs.length === 0 &&

@@ -9,7 +9,7 @@ const userRecord = PropTypes.shape({
   uid: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   email: PropTypes.string.isRequired,
-  role: PropTypes.number.isRequired,
+  role: PropTypes.string.isRequired,
 });
 
 export {
