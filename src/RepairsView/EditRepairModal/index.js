@@ -10,31 +10,38 @@ import {
 import { SingleDatePicker } from 'react-dates';
 import moment from 'moment';
 import './customDatePicker.css';
-import { userRecord } from '../../proptypes';
+import { userRecord, repairRecord } from '../../proptypes';
 import firebase from '../../firebase';
 
 class EditRepairModal extends React.PureComponent {
+  static NewRepair = {
+    date: moment(),
+    uid: '',
+    description: '',
+    comments: '',
+  }
+
   constructor(props) {
     super(props);
 
+    const repair = this.props.repair || EditRepairModal.NewRepair;
+    // eslint-disable-next-line
+    const hour = (repair.date.hour() + 11) % 12 + 1;
+    const ampm = repair.date.hour() >= 12 ? 'pm' : 'am';
+
     this.state = {
       open: false,
-      repair: {
-        date: moment(),
-        uid: '',
-        description: '',
-        comments: '',
-      },
-      ampm: 'pm',
-      hour: 12,
+      repair,
+      ampm,
+      hour,
       datePickerFocus: false,
       saving: false,
       error: null,
     };
 
-    this.hours = [...Array(12)].map((_, hour) => ({
-      text: `${hour}:00`,
-      value: hour,
+    this.hours = [...Array(12)].map((_, hh) => ({
+      text: `${hh}:00`,
+      value: hh,
     }));
   }
 
@@ -126,13 +133,19 @@ class EditRepairModal extends React.PureComponent {
     });
 
     const repair = { ...this.state.repair };
-    const hour = this.state.hour + (this.state.ampm === 'pm' ? 12 : 0);
+    const pm = this.state.ampm === 'pm';
+    // eslint-disable-next-line
+    const hour = this.state.hour === 12 ? pm ? 12 : 0 : pm ? this.state.hour + 12 : this.state.hour;
     repair.date = repair.date.set({ hour, minute: 0, second: 0, millisecond: 0 }).format();
     repair.state = repair.uid ? 'assigned' : 'new';
     repair.manager = firebase.auth().currentUser.uid;
 
-    const newRepairRef = firebase.database().ref('repairs').push();
-    newRepairRef.set(repair)
+    const promise = this.props.repair ?
+      firebase.database().ref(`repairs/${this.props.repair.key}`).update(repair)
+      :
+      firebase.database().ref('repairs').push().set(repair);
+
+    promise
       .then(() => {
         this.onClose();
       })
@@ -162,13 +175,13 @@ class EditRepairModal extends React.PureComponent {
         onClose={this.onClose}
         size="small"
         trigger={
-          <Button floated="right" compact positive>
-            {this.props.createMode && <Icon name="add" />}
-            {this.props.createMode ? 'Add Repair' : 'Edit Repair'}
+          <Button floated="right" compact color={this.props.repair ? 'grey' : 'blue'}>
+            <Icon name={this.props.repair ? 'edit' : 'add'} />
+            {this.props.repair ? 'Edit Repair' : 'Add Repair'}
           </Button>
         }
       >
-        <Modal.Header>{this.props.createMode ? 'Create Repair' : 'Edit Repair'}</Modal.Header>
+        <Modal.Header>{this.props.repair ? 'Edit Repair' : 'Create Repair'}</Modal.Header>
         <Modal.Content>
           <Form loading={this.state.saving} error={this.state.error}>
             <Message error>
@@ -222,7 +235,7 @@ class EditRepairModal extends React.PureComponent {
             primary
             disabled={!canSave}
             onClick={this.onSave}
-            content={this.props.createMode ? 'Create' : 'Save'}
+            content={this.props.repair ? 'Save' : 'Create'}
           />
         </Modal.Actions>
       </Modal>
@@ -230,9 +243,13 @@ class EditRepairModal extends React.PureComponent {
   }
 }
 
+EditRepairModal.defaultProps = {
+  repair: null,
+};
+
 EditRepairModal.propTypes = {
-  createMode: PropTypes.bool.isRequired,
   users: PropTypes.arrayOf(userRecord).isRequired,
+  repair: repairRecord,
 };
 
 export default EditRepairModal;

@@ -12,8 +12,16 @@ const userRecord = PropTypes.shape({
   role: PropTypes.string.isRequired,
 });
 
+const repairRecord = PropTypes.shape({
+  date: PropTypes.object.isRequired,
+  description: PropTypes.string.isRequired,
+  uid: PropTypes.string,
+  comments: PropTypes.string,
+});
+
 export {
   firebaseUser,
   userRecord,
+  repairRecord,
 };
 

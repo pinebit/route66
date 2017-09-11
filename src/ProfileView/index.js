@@ -75,9 +75,6 @@ class ProfileView extends React.PureComponent {
               content="Failed to retreive your profile data."
             />
             <Form.Button disabled fluid>
-              Disable Account
-            </Form.Button>
-            <Form.Button disabled fluid>
               Change Password
             </Form.Button>
           </Form>

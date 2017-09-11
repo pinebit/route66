@@ -14,8 +14,8 @@ import logoIcon from '../img/logo.svg';
 
 class SignInForm extends React.Component {
   state = {
-    email: 'pinebit@gmail.com',
-    password: 'lenasuxx',
+    email: '',
+    password: '',
     loading: false,
     error: null,
   };

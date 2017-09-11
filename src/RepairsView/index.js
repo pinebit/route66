@@ -31,15 +31,6 @@ class RepairsView extends React.PureComponent {
   }
 
   componentDidMount() {
-    // reading repairs
-    readArrayAsync('repairs', (repairs) => {
-      this.setState({
-        ...this.state,
-        repairs: this.convertRepairs(repairs),
-        confirm: null,
-      });
-    });
-
     // reading users
     readArrayAsync('users', (users) => {
       this.setState({
@@ -49,9 +40,19 @@ class RepairsView extends React.PureComponent {
         confirm: null,
       });
     });
+
+    // reading repairs
+    readArrayAsync('repairs', (repairs) => {
+      this.setState({
+        ...this.state,
+        repairs: this.convertRepairs(repairs),
+        confirm: null,
+      });
+    });
   }
 
   componentWillUnmount() {
+    firebase.database().ref('users').off('value');
     firebase.database().ref('repairs').off('value');
   }
 
@@ -68,6 +69,45 @@ class RepairsView extends React.PureComponent {
     this.onFilterChange(null);
   }
 
+  onComplete = (repair) => {
+    this.setState({
+      ...this.state,
+      confirm: {
+        content: 'Do you want to mark the repair as completed?',
+        action: () => this.updateRepair({ ...repair, state: 'complete' }),
+      },
+    });
+  }
+
+  onApprove = (repair) => {
+    this.setState({
+      ...this.state,
+      confirm: {
+        content: 'Do you want to approve the completed repair?',
+        action: () => this.updateRepair({ ...repair, state: 'approved' }),
+      },
+    });
+  }
+
+  onDelete = (repair) => {
+    this.setState({
+      ...this.state,
+      confirm: {
+        content: 'Do you want to delete this repair?',
+        action: () => this.deleteRepair(repair),
+      },
+    });
+  }
+
+  updateRepair = (repair) => {
+    const record = { ...repair, date: repair.date.format() };
+    firebase.database().ref(`repairs/${repair.key}`).update(record);
+  };
+
+  deleteRepair = (repair) => {
+    firebase.database().ref(`repairs/${repair.key}`).remove();
+  };
+
   closeConfirm = () => {
     this.setState({
       ...this.state,
@@ -83,20 +123,42 @@ class RepairsView extends React.PureComponent {
     return false;
   }
 
-  convertRepairs = repairs =>
-    repairs
+  convertRepairs = (repairs) => {
+    const myRepairs = repair => repair.uid === this.state.user.key;
+    const allRepairs = () => true;
+
+    return repairs
+      .filter(this.state.user.role === 'user' ? myRepairs : allRepairs)
       .map(repair => ({ ...repair, date: moment(repair.date) }))
       .sort((a, b) => a.date > b.date);
+  }
 
-  renderActions = repair => (
-    <Dropdown item text="Actions">
-      <Dropdown.Menu>
-        {repair.state === 'assigned' && <Dropdown.Item>Complete</Dropdown.Item>}
-        {repair.state === 'complete' && <Dropdown.Item>Approve</Dropdown.Item>}
-        {repair.state === 'new' && this.state.user.role !== 'user' && <Dropdown.Item>Assign User</Dropdown.Item>}
-      </Dropdown.Menu>
-    </Dropdown>
-  );
+  renderActions = (repair) => {
+    const notUser = this.state.user.role !== 'user';
+    const myRepair = this.state.user.key === repair.uid;
+    const canComplete = repair.state === 'assigned' && myRepair;
+    const canApprove = repair.state === 'complete' && notUser;
+
+    if (!notUser && !canComplete) {
+      return null;
+    }
+
+    return (
+      <Dropdown item text="Actions">
+        <Dropdown.Menu>
+          {canComplete &&
+            <Dropdown.Item icon="check" text="Complete" onClick={() => this.onComplete(repair)} />
+          }
+          {canApprove &&
+            <Dropdown.Item text="Approve" onClick={() => this.onApprove(repair)} />
+          }
+          {notUser &&
+            <Dropdown.Item icon="delete" text="Delete" onClick={() => this.onDelete(repair)} />
+          }
+        </Dropdown.Menu>
+      </Dropdown>
+    );
+  };
 
   renderUser = (uid) => {
     const user = this.state.users.find(u => u.key === uid);
@@ -113,7 +175,7 @@ class RepairsView extends React.PureComponent {
       <div>
         <Header as="h3" attached="top" block color={this.state.filtering ? 'blue' : undefined}>
           Repairs ({repairs.length})
-          {this.state.user.role !== 'user' && <EditRepairModal createMode users={this.state.users} />}
+          {this.state.user.role !== 'user' && <EditRepairModal users={this.state.users} />}
         </Header>
         <Segment attached>
           {this.state.repairs === null
@@ -139,7 +201,12 @@ class RepairsView extends React.PureComponent {
                     <Table.Cell>{this.renderUser(repair.uid)}</Table.Cell>
                     <Table.Cell>{repair.state}</Table.Cell>
                     <Table.Cell>{repair.comments}</Table.Cell>
-                    <Table.Cell>{this.renderActions(repair)}</Table.Cell>
+                    <Table.Cell>
+                      {this.renderActions(repair)}
+                      {this.state.user.role !== 'user' &&
+                        <EditRepairModal users={this.state.users} repair={repair} />
+                      }
+                    </Table.Cell>
                   </Table.Row>
                 ))}
                 {repairs.length === 0 &&
