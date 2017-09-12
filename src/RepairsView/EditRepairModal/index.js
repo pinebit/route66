@@ -9,7 +9,7 @@ import {
 } from 'semantic-ui-react';
 import { SingleDatePicker } from 'react-dates';
 import moment from 'moment';
-import { userRecord, repairRecord } from '../../proptypes';
+import { userRecordShape, repairRecordShape } from '../../shapes';
 import firebase from '../../firebase';
 
 class EditRepairModal extends React.PureComponent {
@@ -131,7 +131,7 @@ class EditRepairModal extends React.PureComponent {
       saving: true,
     });
 
-    const repair = { ...this.state.repair };
+    const { key, ...repair } = { ...this.state.repair };
     const pm = this.state.ampm === 'pm';
     // eslint-disable-next-line
     const hour = this.state.hour === 12 ? pm ? 12 : 0 : pm ? this.state.hour + 12 : this.state.hour;
@@ -149,9 +149,7 @@ class EditRepairModal extends React.PureComponent {
       firebase.database().ref('repairs').push().set(repair);
 
     promise
-      .then(() => {
-        this.onClose();
-      })
+      .then(this.onClose)
       .catch((error) => {
         this.setState({
           ...this.state,
@@ -252,8 +250,8 @@ EditRepairModal.defaultProps = {
 };
 
 EditRepairModal.propTypes = {
-  users: PropTypes.arrayOf(userRecord).isRequired,
-  repair: repairRecord,
+  users: PropTypes.arrayOf(userRecordShape).isRequired,
+  repair: repairRecordShape,
 };
 
 export default EditRepairModal;

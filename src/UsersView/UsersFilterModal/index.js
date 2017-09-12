@@ -6,7 +6,7 @@ import {
   Form,
   Icon,
 } from 'semantic-ui-react';
-import { usersFilter } from '../../proptypes';
+import { usersFilterShape } from '../../shapes';
 
 class UsersFilterModal extends React.PureComponent {
   constructor(props) {
@@ -140,7 +140,7 @@ class UsersFilterModal extends React.PureComponent {
 
 UsersFilterModal.propTypes = {
   filtering: PropTypes.bool.isRequired,
-  filter: usersFilter.isRequired,
+  filter: usersFilterShape.isRequired,
   onFilterChange: PropTypes.func.isRequired,
 };
 

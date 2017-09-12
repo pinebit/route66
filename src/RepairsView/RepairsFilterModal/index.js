@@ -7,7 +7,7 @@ import {
   Icon,
 } from 'semantic-ui-react';
 import { DateRangePicker } from 'react-dates';
-import { userRecord, usersFilter } from '../../proptypes';
+import { userRecordShape, usersFilterShape } from '../../shapes';
 
 class RepairsFilterModal extends React.PureComponent {
   constructor(props) {
@@ -172,9 +172,9 @@ class RepairsFilterModal extends React.PureComponent {
 
 RepairsFilterModal.propTypes = {
   filtering: PropTypes.bool.isRequired,
-  filter: usersFilter.isRequired,
+  filter: usersFilterShape.isRequired,
   onFilterChange: PropTypes.func.isRequired,
-  users: PropTypes.arrayOf(userRecord).isRequired,
+  users: PropTypes.arrayOf(userRecordShape).isRequired,
 };
 
 export default RepairsFilterModal;

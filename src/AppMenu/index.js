@@ -7,7 +7,7 @@ import {
 import Gravatar from 'react-gravatar';
 import logoIcon from '../img/logo.svg';
 import MenuLink from './MenuLink';
-import * as proptypes from '../proptypes';
+import { userRecordShape } from '../shapes';
 
 const AppMenu = ({ user }) => {
   const authenticated = !!user;
@@ -25,7 +25,7 @@ const AppMenu = ({ user }) => {
       <MenuLink to="/repairs" visible={authenticated}>
         Repairs
       </MenuLink>
-      <MenuLink to="/users" visible={authenticated}>
+      <MenuLink to="/users" visible={authenticated && user.role !== 'user'}>
         Users
       </MenuLink>
       <Menu.Menu position="right">
@@ -56,7 +56,7 @@ AppMenu.defaultProps = {
 };
 
 AppMenu.propTypes = {
-  user: proptypes.firebaseUser,
+  user: userRecordShape,
 };
 
 export default AppMenu;

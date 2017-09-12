@@ -3,12 +3,12 @@ import {
   Header,
   Table,
   Segment,
-  Loader,
   Confirm,
   Dropdown,
 } from 'semantic-ui-react';
 import UsersFilterModal from './UsersFilterModal';
-import firebase, { readArrayAsync } from '../firebase';
+import firebase from '../firebase';
+import { storeShape } from '../shapes';
 
 class UsersView extends React.PureComponent {
   static DefaultFilter = {
@@ -19,25 +19,9 @@ class UsersView extends React.PureComponent {
   }
 
   state = {
-    users: null,
     confirm: null,
     filter: UsersView.DefaultFilter,
     filtering: false,
-  }
-
-  componentDidMount() {
-    // reading users
-    readArrayAsync('users', (users) => {
-      this.setState({
-        ...this.state,
-        users,
-        confirm: null,
-      });
-    });
-  }
-
-  componentWillUnmount() {
-    firebase.database().ref('users').off('value');
   }
 
   onDisable = (user) => {
@@ -91,7 +75,8 @@ class UsersView extends React.PureComponent {
   }
 
   updateUser = (user) => {
-    firebase.database().ref(`users/${user.uid}`).update(user);
+    firebase.database().ref(`users/${user.key}`).update(user);
+    this.closeConfirm();
   };
 
   usersFilter = (user) => {
@@ -136,7 +121,7 @@ class UsersView extends React.PureComponent {
   );
 
   render() {
-    const users = this.state.users ? this.state.users.filter(this.usersFilter) : [];
+    const users = this.props.store.users.filter(this.usersFilter);
 
     return (
       <div>
@@ -149,38 +134,35 @@ class UsersView extends React.PureComponent {
           />
         </Header>
         <Segment attached>
-          {this.state.users === null
-            ? <Loader active inline="centered" />
-            : <Table striped>
-              <Table.Header>
-                <Table.Row>
-                  <Table.HeaderCell>Name</Table.HeaderCell>
-                  <Table.HeaderCell>E-mail</Table.HeaderCell>
-                  <Table.HeaderCell>Role</Table.HeaderCell>
-                  <Table.HeaderCell>State</Table.HeaderCell>
-                  <Table.HeaderCell>Actions</Table.HeaderCell>
+          <Table striped>
+            <Table.Header>
+              <Table.Row>
+                <Table.HeaderCell>Name</Table.HeaderCell>
+                <Table.HeaderCell>E-mail</Table.HeaderCell>
+                <Table.HeaderCell>Role</Table.HeaderCell>
+                <Table.HeaderCell>State</Table.HeaderCell>
+                <Table.HeaderCell>Actions</Table.HeaderCell>
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
+              {users.map(user => (
+                <Table.Row key={user.uid}>
+                  <Table.Cell>{user.name}</Table.Cell>
+                  <Table.Cell>{user.email}</Table.Cell>
+                  <Table.Cell>{user.role}</Table.Cell>
+                  <Table.Cell>{user.disabled ? 'Disabled' : 'Enabled'}</Table.Cell>
+                  <Table.Cell>{user.role !== 'admin' && this.renderActions(user)}</Table.Cell>
                 </Table.Row>
-              </Table.Header>
-              <Table.Body>
-                {users.map(user => (
-                  <Table.Row key={user.uid}>
-                    <Table.Cell>{user.name}</Table.Cell>
-                    <Table.Cell>{user.email}</Table.Cell>
-                    <Table.Cell>{user.role}</Table.Cell>
-                    <Table.Cell>{user.disabled ? 'Disabled' : 'Enabled'}</Table.Cell>
-                    <Table.Cell>{user.role !== 'admin' && this.renderActions(user)}</Table.Cell>
-                  </Table.Row>
-                ))}
-                {users.length === 0 &&
-                  <Table.Row>
-                    <Table.Cell>
-                      No records found. {this.state.filtering && <a href="" onClick={this.onResetFilter}>Reset Filter</a>}
-                    </Table.Cell>
-                  </Table.Row>
-                }
-              </Table.Body>
-            </Table>
-          }
+              ))}
+              {users.length === 0 &&
+                <Table.Row>
+                  <Table.Cell>
+                    No records found. {this.state.filtering && <a href="" onClick={this.onResetFilter}>Reset Filter</a>}
+                  </Table.Cell>
+                </Table.Row>
+              }
+            </Table.Body>
+          </Table>
         </Segment>
         {this.state.confirm &&
           <Confirm
@@ -194,5 +176,9 @@ class UsersView extends React.PureComponent {
     );
   }
 }
+
+UsersView.propTypes = {
+  store: storeShape.isRequired,
+};
 
 export default UsersView;

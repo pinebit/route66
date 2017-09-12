@@ -3,14 +3,13 @@ import {
   Header,
   Table,
   Segment,
-  Loader,
   Confirm,
   Dropdown,
 } from 'semantic-ui-react';
-import moment from 'moment';
 import EditRepairModal from './EditRepairModal';
 import RepairsFilterModal from './RepairsFilterModal';
-import firebase, { readArrayAsync } from '../firebase';
+import firebase from '../firebase';
+import { storeShape } from '../shapes';
 
 class RepairsView extends React.PureComponent {
   static DefaultFilter = {
@@ -22,38 +21,9 @@ class RepairsView extends React.PureComponent {
   }
 
   state = {
-    repairs: null,
-    users: [],
     confirm: null,
     filter: RepairsView.DefaultFilter,
     filtering: false,
-    user: {},
-  }
-
-  componentDidMount() {
-    // reading users
-    readArrayAsync('users', (users) => {
-      this.setState({
-        ...this.state,
-        users,
-        user: users.find(user => user.key === firebase.auth().currentUser.uid),
-        confirm: null,
-      });
-    });
-
-    // reading repairs
-    readArrayAsync('repairs', (repairs) => {
-      this.setState({
-        ...this.state,
-        repairs: this.convertRepairs(repairs),
-        confirm: null,
-      });
-    });
-  }
-
-  componentWillUnmount() {
-    firebase.database().ref('users').off('value');
-    firebase.database().ref('repairs').off('value');
   }
 
   onFilterChange = (filter) => {
@@ -102,10 +72,12 @@ class RepairsView extends React.PureComponent {
   updateRepair = (repair) => {
     const record = { ...repair, date: repair.date.format() };
     firebase.database().ref(`repairs/${repair.key}`).update(record);
+    this.closeConfirm();
   };
 
   deleteRepair = (repair) => {
     firebase.database().ref(`repairs/${repair.key}`).remove();
+    this.closeConfirm();
   };
 
   closeConfirm = () => {
@@ -148,19 +120,10 @@ class RepairsView extends React.PureComponent {
     return true;
   }
 
-  convertRepairs = (repairs) => {
-    const myRepairs = repair => repair.uid === this.state.user.key;
-    const allRepairs = () => true;
-
-    return repairs
-      .filter(this.state.user.role === 'user' ? myRepairs : allRepairs)
-      .map(repair => ({ ...repair, date: moment(repair.date) }))
-      .sort((a, b) => a.date > b.date);
-  }
-
   renderActions = (repair) => {
-    const notUser = this.state.user.role !== 'user';
-    const myRepair = this.state.user.key === repair.uid;
+    const thisUser = this.props.store.user;
+    const notUser = thisUser.role !== 'user';
+    const myRepair = thisUser.key === repair.uid;
     const canComplete = repair.state === 'assigned' && myRepair;
     const canApprove = repair.state === 'complete' && notUser;
 
@@ -186,7 +149,7 @@ class RepairsView extends React.PureComponent {
   };
 
   renderUser = (uid) => {
-    const user = this.state.users.find(u => u.key === uid);
+    const user = this.props.store.users.find(u => u.key === uid);
     if (!user) {
       return '-';
     }
@@ -194,7 +157,7 @@ class RepairsView extends React.PureComponent {
   }
 
   render() {
-    const repairs = this.state.repairs ? this.state.repairs.filter(this.repairsFilter) : [];
+    const repairs = this.props.store.repairs.filter(this.repairsFilter);
 
     return (
       <div>
@@ -204,52 +167,49 @@ class RepairsView extends React.PureComponent {
             filtering={this.state.filtering}
             filter={this.state.filter}
             onFilterChange={this.onFilterChange}
-            users={this.state.users}
+            users={this.props.store.users}
           />
-          {this.state.user.role !== 'user' && <EditRepairModal users={this.state.users} />}
+          {this.props.store.user.role !== 'user' && <EditRepairModal users={this.props.store.users} />}
         </Header>
         <Segment attached>
-          {this.state.repairs === null
-            ? <Loader active inline="centered" />
-            : <Table striped>
-              <Table.Header>
-                <Table.Row>
-                  <Table.HeaderCell>Date</Table.HeaderCell>
-                  <Table.HeaderCell>Time</Table.HeaderCell>
-                  <Table.HeaderCell>Description</Table.HeaderCell>
-                  <Table.HeaderCell>User</Table.HeaderCell>
-                  <Table.HeaderCell>State</Table.HeaderCell>
-                  <Table.HeaderCell>Comments</Table.HeaderCell>
-                  <Table.HeaderCell>Actions</Table.HeaderCell>
+          <Table striped>
+            <Table.Header>
+              <Table.Row>
+                <Table.HeaderCell>Date</Table.HeaderCell>
+                <Table.HeaderCell>Time</Table.HeaderCell>
+                <Table.HeaderCell>Description</Table.HeaderCell>
+                <Table.HeaderCell>User</Table.HeaderCell>
+                <Table.HeaderCell>State</Table.HeaderCell>
+                <Table.HeaderCell>Comments</Table.HeaderCell>
+                <Table.HeaderCell>Actions</Table.HeaderCell>
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
+              {repairs.map(repair => (
+                <Table.Row key={repair.key}>
+                  <Table.Cell>{repair.date.format('DD MMM YYYY')}</Table.Cell>
+                  <Table.Cell>{repair.date.format('h:mmA')}</Table.Cell>
+                  <Table.Cell>{repair.description}</Table.Cell>
+                  <Table.Cell>{this.renderUser(repair.uid)}</Table.Cell>
+                  <Table.Cell>{repair.state}</Table.Cell>
+                  <Table.Cell>{repair.comments}</Table.Cell>
+                  <Table.Cell>
+                    {this.renderActions(repair)}
+                    {this.props.store.user.role !== 'user' &&
+                      <EditRepairModal users={this.props.store.users} repair={repair} />
+                    }
+                  </Table.Cell>
                 </Table.Row>
-              </Table.Header>
-              <Table.Body>
-                {repairs.map(repair => (
-                  <Table.Row key={repair.key}>
-                    <Table.Cell>{repair.date.format('DD MMM YYYY')}</Table.Cell>
-                    <Table.Cell>{repair.date.format('h:mmA')}</Table.Cell>
-                    <Table.Cell>{repair.description}</Table.Cell>
-                    <Table.Cell>{this.renderUser(repair.uid)}</Table.Cell>
-                    <Table.Cell>{repair.state}</Table.Cell>
-                    <Table.Cell>{repair.comments}</Table.Cell>
-                    <Table.Cell>
-                      {this.renderActions(repair)}
-                      {this.state.user.role !== 'user' &&
-                        <EditRepairModal users={this.state.users} repair={repair} />
-                      }
-                    </Table.Cell>
-                  </Table.Row>
-                ))}
-                {repairs.length === 0 &&
-                  <Table.Row>
-                    <Table.Cell>
-                      No records found. {this.state.filtering && <a href="" onClick={this.onResetFilter}>Reset Filter</a>}
-                    </Table.Cell>
-                  </Table.Row>
-                }
-              </Table.Body>
-            </Table>
-          }
+              ))}
+              {repairs.length === 0 &&
+                <Table.Row>
+                  <Table.Cell>
+                    No records found. {this.state.filtering && <a href="" onClick={this.onResetFilter}>Reset Filter</a>}
+                  </Table.Cell>
+                </Table.Row>
+              }
+            </Table.Body>
+          </Table>
         </Segment>
         {this.state.confirm &&
           <Confirm
@@ -263,5 +223,9 @@ class RepairsView extends React.PureComponent {
     );
   }
 }
+
+RepairsView.propTypes = {
+  store: storeShape.isRequired,
+};
 
 export default RepairsView;
