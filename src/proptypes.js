@@ -12,6 +12,13 @@ const userRecord = PropTypes.shape({
   role: PropTypes.string.isRequired,
 });
 
+const usersFilter = PropTypes.shape({
+  name: PropTypes.string,
+  email: PropTypes.string,
+  role: PropTypes.string,
+  disabled: PropTypes.string,
+});
+
 const repairRecord = PropTypes.shape({
   date: PropTypes.object.isRequired,
   description: PropTypes.string.isRequired,
@@ -19,9 +26,19 @@ const repairRecord = PropTypes.shape({
   comments: PropTypes.string,
 });
 
+const repairsFilter = PropTypes.shape({
+  startDate: PropTypes.object,
+  endDate: PropTypes.object,
+  description: PropTypes.string,
+  state: PropTypes.string,
+  user: PropTypes.string,
+});
+
 export {
   firebaseUser,
   userRecord,
+  usersFilter,
   repairRecord,
+  repairsFilter,
 };
 

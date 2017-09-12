@@ -9,7 +9,6 @@ import {
 } from 'semantic-ui-react';
 import { SingleDatePicker } from 'react-dates';
 import moment from 'moment';
-import './customDatePicker.css';
 import { userRecord, repairRecord } from '../../proptypes';
 import firebase from '../../firebase';
 
@@ -137,7 +136,11 @@ class EditRepairModal extends React.PureComponent {
     // eslint-disable-next-line
     const hour = this.state.hour === 12 ? pm ? 12 : 0 : pm ? this.state.hour + 12 : this.state.hour;
     repair.date = repair.date.set({ hour, minute: 0, second: 0, millisecond: 0 }).format();
-    repair.state = repair.uid ? 'assigned' : 'new';
+    if (repair.uid) {
+      repair.state = repair.state === 'new' ? 'assigned' : repair.state;
+    } else {
+      repair.state = 'new';
+    }
     repair.manager = firebase.auth().currentUser.uid;
 
     const promise = this.props.repair ?
@@ -196,6 +199,7 @@ class EditRepairModal extends React.PureComponent {
                   showDefaultInputIcon
                   numberOfMonths={1}
                   daySize={40}
+                  isOutsideRange={() => false}
                   focused={this.state.datePickerFocus}
                   date={this.state.repair.date}
                   onDateChange={this.onDateChange}

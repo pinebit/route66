@@ -9,16 +9,16 @@ import {
 } from 'semantic-ui-react';
 import moment from 'moment';
 import EditRepairModal from './EditRepairModal';
+import RepairsFilterModal from './RepairsFilterModal';
 import firebase, { readArrayAsync } from '../firebase';
 
 class RepairsView extends React.PureComponent {
   static DefaultFilter = {
-    date: '',
-    time: '',
-    repair: '',
-    uid: '',
-    status: '*',
-    comment: '',
+    startDate: null,
+    endDate: null,
+    description: '',
+    user: '',
+    state: '*',
   }
 
   state = {
@@ -115,12 +115,37 @@ class RepairsView extends React.PureComponent {
     });
   }
 
-  repairsFilter = () => {
+  repairsFilter = (repair) => {
     if (!this.state.filtering) {
       return true;
     }
 
-    return false;
+    if (this.state.filter.description !== '' &&
+      repair.description.toUpperCase().indexOf(this.state.filter.description.toUpperCase()) < 0) {
+      return false;
+    }
+
+    if (this.state.filter.state !== '*' && this.state.filter.state !== repair.state) {
+      return false;
+    }
+
+    if (this.state.filter.startDate &&
+      this.state.filter.startDate.isValid() &&
+      this.state.filter.startDate > repair.date) {
+      return false;
+    }
+
+    if (this.state.filter.endDate &&
+      this.state.filter.endDate.isValid() &&
+      this.state.filter.endDate < repair.date) {
+      return false;
+    }
+
+    if (this.state.filter.user && this.state.filter.user !== repair.uid) {
+      return false;
+    }
+
+    return true;
   }
 
   convertRepairs = (repairs) => {
@@ -175,6 +200,12 @@ class RepairsView extends React.PureComponent {
       <div>
         <Header as="h3" attached="top" block color={this.state.filtering ? 'blue' : undefined}>
           Repairs ({repairs.length})
+          <RepairsFilterModal
+            filtering={this.state.filtering}
+            filter={this.state.filter}
+            onFilterChange={this.onFilterChange}
+            users={this.state.users}
+          />
           {this.state.user.role !== 'user' && <EditRepairModal users={this.state.users} />}
         </Header>
         <Segment attached>

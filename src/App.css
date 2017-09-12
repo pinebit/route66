@@ -6,3 +6,9 @@ body {
     margin: 0 auto;
     max-width: 1200px;
 }
+
+/* customizing react-dates */
+.DateInput {
+    font-size: 14px;
+    padding: 0 8px 0 4px;
+}
