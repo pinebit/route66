@@ -169,7 +169,12 @@ class RepairsView extends React.PureComponent {
             onFilterChange={this.onFilterChange}
             users={this.props.store.users}
           />
-          {this.props.store.user.role !== 'user' && <EditRepairModal users={this.props.store.users} />}
+          {this.props.store.user.role !== 'user' &&
+            <EditRepairModal
+              users={this.props.store.users}
+              repairs={this.props.store.repairs}
+            />
+          }
         </Header>
         <Segment attached>
           <Table striped>
@@ -196,7 +201,11 @@ class RepairsView extends React.PureComponent {
                   <Table.Cell>
                     {this.renderActions(repair)}
                     {this.props.store.user.role !== 'user' &&
-                      <EditRepairModal users={this.props.store.users} repair={repair} />
+                      <EditRepairModal
+                        users={this.props.store.users}
+                        repair={repair}
+                        repairs={this.props.store.repairs}
+                      />
                     }
                   </Table.Cell>
                 </Table.Row>

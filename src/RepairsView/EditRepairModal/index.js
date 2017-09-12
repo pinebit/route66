@@ -42,6 +42,12 @@ class EditRepairModal extends React.PureComponent {
       text: `${hh}:00`,
       value: hh,
     }));
+
+    this.occupied = new Set(
+      this.props.repairs
+        .filter(r => (this.props.repair ? r.date !== this.props.repair.date : true))
+        .map(r => r.date.format()),
+    );
   }
 
   onOpen = () => {
@@ -132,15 +138,14 @@ class EditRepairModal extends React.PureComponent {
     });
 
     const { key, ...repair } = { ...this.state.repair };
-    const pm = this.state.ampm === 'pm';
-    // eslint-disable-next-line
-    const hour = this.state.hour === 12 ? pm ? 12 : 0 : pm ? this.state.hour + 12 : this.state.hour;
-    repair.date = repair.date.set({ hour, minute: 0, second: 0, millisecond: 0 }).format();
-    if (repair.uid) {
+    repair.date = this.buildDateTime().format();
+
+    if (repair.uid && repair.state) {
       repair.state = repair.state === 'new' ? 'assigned' : repair.state;
     } else {
       repair.state = 'new';
     }
+
     repair.manager = firebase.auth().currentUser.uid;
 
     const promise = this.props.repair ?
@@ -159,6 +164,15 @@ class EditRepairModal extends React.PureComponent {
       });
   }
 
+  buildDateTime = () => {
+    const pm = this.state.ampm === 'pm';
+    // eslint-disable-next-line
+    const hour = this.state.hour === 12 ? pm ? 12 : 0 : pm ? this.state.hour + 12 : this.state.hour;
+    const datetime = this.state.repair.date.clone();
+    datetime.set({ hour, minute: 0, second: 0, millisecond: 0 });
+    return datetime;
+  }
+
   selectUsers = () => this.props.users
     .filter(user => user.role === 'user' && !user.disabled)
     .map(user => ({
@@ -167,7 +181,10 @@ class EditRepairModal extends React.PureComponent {
     }))
 
   render() {
-    const canSave = this.state.repair.date.isValid() && this.state.repair.description;
+    const editing = !!this.props.repair;
+    const date = this.buildDateTime().format();
+    const duplicate = this.occupied.has(date);
+    const canSave = this.state.repair.date.isValid() && this.state.repair.description && !duplicate;
 
     return (
       <Modal
@@ -176,18 +193,15 @@ class EditRepairModal extends React.PureComponent {
         onClose={this.onClose}
         size="small"
         trigger={
-          <Button floated="right" compact color={this.props.repair ? 'grey' : 'blue'}>
-            <Icon name={this.props.repair ? 'edit' : 'add'} />
-            {this.props.repair ? 'Edit Repair' : 'Add Repair'}
+          <Button floated="right" compact color={editing ? 'grey' : 'blue'}>
+            <Icon name={editing ? 'edit' : 'add'} />
+            {editing ? 'Edit Repair' : 'Add Repair'}
           </Button>
         }
       >
-        <Modal.Header>{this.props.repair ? 'Edit Repair' : 'Create Repair'}</Modal.Header>
+        <Modal.Header>{editing ? 'Edit Repair' : 'Create Repair'}</Modal.Header>
         <Modal.Content>
-          <Form loading={this.state.saving} error={this.state.error}>
-            <Message error>
-              {this.state.error}
-            </Message>
+          <Form loading={this.state.saving} error={this.state.error || duplicate}>
             <Form.Group inline>
               <Form.Input inline label="Date" required>
                 <SingleDatePicker
@@ -208,6 +222,9 @@ class EditRepairModal extends React.PureComponent {
               <Form.Radio label="AM" value="am" name="timeGroup" checked={this.state.ampm === 'am'} onChange={this.onAmPmChange} />
               <Form.Radio label="PM" value="pm" name="timeGroup" checked={this.state.ampm === 'pm'} onChange={this.onAmPmChange} />
             </Form.Group>
+            <Message error>
+              {this.state.error || 'Selected date/time slot is occupied by another repair. Please change the date or time.'}
+            </Message>
             <Form.Select
               inline
               label="User"
@@ -237,7 +254,7 @@ class EditRepairModal extends React.PureComponent {
             primary
             disabled={!canSave}
             onClick={this.onSave}
-            content={this.props.repair ? 'Save' : 'Create'}
+            content={editing ? 'Save' : 'Create'}
           />
         </Modal.Actions>
       </Modal>
@@ -251,6 +268,7 @@ EditRepairModal.defaultProps = {
 
 EditRepairModal.propTypes = {
   users: PropTypes.arrayOf(userRecordShape).isRequired,
+  repairs: PropTypes.arrayOf(repairRecordShape).isRequired,
   repair: repairRecordShape,
 };
 
