@@ -166,7 +166,6 @@ class RepairsView extends React.PureComponent {
           {canApprove &&
             <Dropdown.Item text="Approve" onClick={() => this.onApprove(repair)} />
           }
-          <Dropdown.Item text="Comments" onClick={() => this.onShowComments(repair)} />
           {notUser &&
             <Dropdown.Item icon="delete" text="Delete" onClick={() => this.onDelete(repair)} />
           }
@@ -181,6 +180,19 @@ class RepairsView extends React.PureComponent {
       return '-';
     }
     return user.name;
+  }
+
+  renderCommentsLink = (repair) => {
+    const handleLinkClick = (e) => {
+      e.preventDefault();
+      this.onShowComments(repair);
+    };
+
+    return (
+      <a href="" onClick={handleLinkClick}>
+        {repair.comments ? `${repair.comments.length} comment(s)` : 'Add comment'}
+      </a>
+    );
   }
 
   render() {
@@ -224,7 +236,7 @@ class RepairsView extends React.PureComponent {
                   <Table.Cell>{repair.description}</Table.Cell>
                   <Table.Cell>{this.renderUser(repair.uid)}</Table.Cell>
                   <Table.Cell>{repair.state}</Table.Cell>
-                  <Table.Cell>{repair.comments ? `${repair.comments.length} comment(s)` : '-'}</Table.Cell>
+                  <Table.Cell>{this.renderCommentsLink(repair)}</Table.Cell>
                   <Table.Cell>
                     {this.renderActions(repair)}
                     {this.props.store.user.role !== 'user' &&
