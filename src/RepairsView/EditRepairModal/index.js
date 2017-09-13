@@ -17,7 +17,6 @@ class EditRepairModal extends React.PureComponent {
     date: moment(),
     uid: '',
     description: '',
-    comments: '',
   }
 
   constructor(props) {
@@ -95,17 +94,6 @@ class EditRepairModal extends React.PureComponent {
     });
   }
 
-  onCommentsChange = (e) => {
-    const repair = {
-      ...this.state.repair,
-      comments: e.target.value,
-    };
-    this.setState({
-      ...this.state,
-      repair,
-    });
-  }
-
   onAmPmChange = (e, { value }) => {
     this.setState({
       ...this.state,
@@ -146,6 +134,7 @@ class EditRepairModal extends React.PureComponent {
       repair.state = 'new';
     }
 
+    repair.comments = this.addComment(repair.comments);
     repair.manager = firebase.auth().currentUser.uid;
 
     const promise = this.props.repair ?
@@ -162,6 +151,18 @@ class EditRepairModal extends React.PureComponent {
           error,
         });
       });
+  }
+
+  addComment = (comments) => {
+    const newComments = (comments && Array.isArray(comments)) ? comments : [];
+
+    newComments.push({
+      date: moment().format('DD MMM YYYY h:mma'),
+      uid: firebase.auth().currentUser.uid,
+      comment: this.props.repair ? 'Repair edited' : 'Repair created',
+    });
+
+    return newComments;
   }
 
   buildDateTime = () => {
@@ -239,11 +240,6 @@ class EditRepairModal extends React.PureComponent {
               fluid
               value={this.state.repair.description}
               onChange={this.onDescriptionChange}
-            />
-            <Form.TextArea
-              label="Comments"
-              value={this.state.repair.comments}
-              onChange={this.onCommentsChange}
             />
           </Form>
         </Modal.Content>

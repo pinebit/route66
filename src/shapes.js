@@ -14,11 +14,17 @@ const usersFilterShape = PropTypes.shape({
   disabled: PropTypes.string,
 });
 
+const commentRecordShape = PropTypes.shape({
+  date: PropTypes.string.isRequired,
+  uid: PropTypes.string.isRequired,
+  comment: PropTypes.string.isRequired,
+});
+
 const repairRecordShape = PropTypes.shape({
   date: PropTypes.object.isRequired,
   description: PropTypes.string.isRequired,
   uid: PropTypes.string,
-  comments: PropTypes.string,
+  comments: PropTypes.arrayOf(commentRecordShape),
 });
 
 const repairsFilterShape = PropTypes.shape({
@@ -39,6 +45,7 @@ const storeShape = PropTypes.shape({
 export {
   userRecordShape,
   usersFilterShape,
+  commentRecordShape,
   repairRecordShape,
   repairsFilterShape,
   storeShape,

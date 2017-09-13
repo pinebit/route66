@@ -8,6 +8,7 @@ import {
 } from 'semantic-ui-react';
 import EditRepairModal from './EditRepairModal';
 import RepairsFilterModal from './RepairsFilterModal';
+import CommentsModal from './CommentsModal';
 import firebase from '../firebase';
 import { storeShape } from '../shapes';
 
@@ -24,6 +25,7 @@ class RepairsView extends React.PureComponent {
     confirm: null,
     filter: RepairsView.DefaultFilter,
     filtering: false,
+    showComments: false,
   }
 
   onFilterChange = (filter) => {
@@ -67,6 +69,30 @@ class RepairsView extends React.PureComponent {
         action: () => this.deleteRepair(repair),
       },
     });
+  }
+
+  onShowComments = (repair) => {
+    this.setState({
+      ...this.state,
+      showComments: true,
+      showCommentsRepair: repair,
+    });
+  }
+
+  onCloseComments = () => {
+    this.setState({
+      ...this.state,
+      showComments: false,
+      showCommentsRepair: null,
+    });
+  }
+
+  onAddComment = (repair, comments) => {
+    const newRepair = { ...repair };
+    newRepair.comments = (newRepair.comments && Array.isArray(newRepair.comments) ? newRepair.comments : []);
+    newRepair.comments.push(comments);
+    this.updateRepair(newRepair);
+    this.onCloseComments();
   }
 
   updateRepair = (repair) => {
@@ -140,6 +166,7 @@ class RepairsView extends React.PureComponent {
           {canApprove &&
             <Dropdown.Item text="Approve" onClick={() => this.onApprove(repair)} />
           }
+          <Dropdown.Item text="Comments" onClick={() => this.onShowComments(repair)} />
           {notUser &&
             <Dropdown.Item icon="delete" text="Delete" onClick={() => this.onDelete(repair)} />
           }
@@ -197,7 +224,7 @@ class RepairsView extends React.PureComponent {
                   <Table.Cell>{repair.description}</Table.Cell>
                   <Table.Cell>{this.renderUser(repair.uid)}</Table.Cell>
                   <Table.Cell>{repair.state}</Table.Cell>
-                  <Table.Cell>{repair.comments}</Table.Cell>
+                  <Table.Cell>{repair.comments ? `${repair.comments.length} comment(s)` : '-'}</Table.Cell>
                   <Table.Cell>
                     {this.renderActions(repair)}
                     {this.props.store.user.role !== 'user' &&
@@ -219,6 +246,14 @@ class RepairsView extends React.PureComponent {
               }
             </Table.Body>
           </Table>
+          {this.state.showComments &&
+            <CommentsModal
+              onClose={this.onCloseComments}
+              users={this.props.store.users}
+              comments={this.state.showCommentsRepair.comments || []}
+              onAddComment={c => this.onAddComment(this.state.showCommentsRepair, c)}
+            />
+          }
         </Segment>
         {this.state.confirm &&
           <Confirm
