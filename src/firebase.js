@@ -1,4 +1,4 @@
-/* global firebase */
+import firebase from 'firebase';
 
 // Initialize Firebase
 const config = {
