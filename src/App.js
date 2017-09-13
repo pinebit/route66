@@ -13,7 +13,7 @@ import ProfileView from './ProfileView';
 import RepairsView from './RepairsView';
 import UsersView from './UsersView';
 import AppFooter from './AppFooter';
-import Welcome from './Welcome';
+import WelcomeView from './WelcomeView';
 import './App.css';
 
 class App extends Component {
@@ -81,7 +81,7 @@ class App extends Component {
       <div className="app">
         <AppMenu user={this.state.user} />
         <Switch>
-          <Route exact path="/" component={Welcome} />
+          <Route exact path="/" component={WelcomeView} />
           <Route exact path="/signin" component={SignInForm} />
           <Route exact path="/signup" component={SignUpForm} />
           <Route exact path="/signout" component={SignOutForm} />

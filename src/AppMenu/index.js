@@ -10,7 +10,7 @@ import MenuLink from './MenuLink';
 import { userRecordShape } from '../shapes';
 
 const AppMenu = ({ user }) => {
-  const authenticated = !!user;
+  const enabled = user ? !user.disabled : false;
 
   return (
     <Menu pointing size="large">
@@ -22,14 +22,14 @@ const AppMenu = ({ user }) => {
           content="Car Repair Shop"
         />
       </Menu.Item>
-      <MenuLink to="/repairs" visible={authenticated}>
+      <MenuLink to="/repairs" visible={enabled}>
         Repairs
       </MenuLink>
-      <MenuLink to="/users" visible={authenticated && user.role !== 'user'}>
+      <MenuLink to="/users" visible={enabled && user.role !== 'user'}>
         Users
       </MenuLink>
       <Menu.Menu position="right">
-        <MenuLink to="/profile" visible={authenticated}>
+        <MenuLink to="/profile" visible={enabled}>
           {user &&
             <Image avatar>
               <Gravatar email={user.email} size={64} />
@@ -37,13 +37,13 @@ const AppMenu = ({ user }) => {
           }
           {user ? (user.displayName || user.email) : ''}
         </MenuLink>
-        <MenuLink to="/signout" visible={authenticated}>
+        <MenuLink to="/signout" visible={enabled}>
           Sign Out
         </MenuLink>
-        <MenuLink to="/signin" visible={!authenticated}>
+        <MenuLink to="/signin" visible={!enabled}>
           Sign In
         </MenuLink>
-        <MenuLink to="/signup" visible={!authenticated}>
+        <MenuLink to="/signup" visible={!enabled}>
           Sign Up
         </MenuLink>
       </Menu.Menu>
