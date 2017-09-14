@@ -51,11 +51,13 @@ class CommentsModal extends React.PureComponent {
   }
 
   render() {
+    const comments = this.props.comments.map((comment, index) => ({ ...comment, key: index }));
+
     return (
       <Modal open onClose={this.props.onClose} size="small" >
         <Modal.Header>Comments</Modal.Header>
         <Modal.Content>
-          <Message visible={!this.props.comments || this.props.comments.length === 0}>
+          <Message hidden={this.props.comments && this.props.comments.length > 0}>
             No comments found for this repair.
           </Message>
           {this.props.comments && this.props.comments.length > 0 &&
@@ -68,8 +70,8 @@ class CommentsModal extends React.PureComponent {
                 </Table.Row>
               </Table.Header>
               <Table.Body>
-                {this.props.comments.map(c => (
-                  <Table.Row key={c.date}>
+                {comments.map(c => (
+                  <Table.Row key={c.key}>
                     <Table.Cell collapsing>{c.date}</Table.Cell>
                     <Table.Cell collapsing>{this.userMap.get(c.uid) || '-'}</Table.Cell>
                     <Table.Cell>{c.comment}</Table.Cell>
