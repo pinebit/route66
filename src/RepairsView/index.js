@@ -232,7 +232,7 @@ class RepairsView extends React.PureComponent {
             </Table.Header>
             <Table.Body>
               {repairs.map(repair => (
-                <Table.Row key={repair.key}>
+                <Table.Row key={repair.key} positive={repair.state === States.Approved}>
                   <Table.Cell>{repair.date.format('DD MMM YYYY')}</Table.Cell>
                   <Table.Cell>{repair.date.format('h:mmA')}</Table.Cell>
                   <Table.Cell>{repair.description}</Table.Cell>

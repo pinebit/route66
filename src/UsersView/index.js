@@ -147,7 +147,7 @@ class UsersView extends React.PureComponent {
             </Table.Header>
             <Table.Body>
               {users.map(user => (
-                <Table.Row key={user.uid}>
+                <Table.Row key={user.uid} negative={user.disabled}>
                   <Table.Cell>{user.name}</Table.Cell>
                   <Table.Cell>{user.email}</Table.Cell>
                   <Table.Cell>{user.role}</Table.Cell>
