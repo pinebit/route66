@@ -5,6 +5,10 @@
         "email": "andrei.smirnov@toptal.com",
         "name": "Andrei Smirnov"
     },
+    "repository": {
+        "type": "git",
+        "url": "https://bitbucket.org/pinebit/route66.git"
+    },
     "version": "0.1.0",
     "private": true,
     "dependencies": {
