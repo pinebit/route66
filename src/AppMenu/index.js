@@ -8,6 +8,7 @@ import Gravatar from 'react-gravatar';
 import logoIcon from '../img/logo.svg';
 import MenuLink from './MenuLink';
 import { userRecordShape } from '../shapes';
+import { Roles } from '../const';
 
 const AppMenu = ({ user }) => {
   const enabled = user ? !user.disabled : false;
@@ -25,7 +26,7 @@ const AppMenu = ({ user }) => {
       <MenuLink to="/repairs" visible={enabled}>
         Repairs
       </MenuLink>
-      <MenuLink to="/users" visible={enabled && user.role !== 'user'}>
+      <MenuLink to="/users" visible={enabled && user.role !== Roles.User}>
         Users
       </MenuLink>
       <Menu.Menu position="right">

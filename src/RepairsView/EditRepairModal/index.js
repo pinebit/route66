@@ -11,6 +11,7 @@ import { SingleDatePicker } from 'react-dates';
 import moment from 'moment';
 import { userRecordShape, repairRecordShape } from '../../shapes';
 import firebase from '../../firebase';
+import { States, Roles } from '../../const';
 
 class EditRepairModal extends React.PureComponent {
   static NewRepair = {
@@ -129,9 +130,9 @@ class EditRepairModal extends React.PureComponent {
     repair.date = this.buildDateTime().format();
 
     if (repair.uid && repair.state) {
-      repair.state = repair.state === 'new' ? 'assigned' : repair.state;
+      repair.state = repair.state === States.New ? States.Assigned : repair.state;
     } else {
-      repair.state = 'new';
+      repair.state = States.New;
     }
 
     repair.comments = this.addComment(repair.comments);
@@ -175,7 +176,7 @@ class EditRepairModal extends React.PureComponent {
   }
 
   selectUsers = () => this.props.users
-    .filter(user => user.role === 'user' && !user.disabled)
+    .filter(user => user.role === Roles.User && !user.disabled)
     .map(user => ({
       text: `<${user.name}> ${user.email}`,
       value: user.key,

@@ -14,6 +14,7 @@ import RepairsView from './RepairsView';
 import UsersView from './UsersView';
 import AppFooter from './AppFooter';
 import WelcomeView from './WelcomeView';
+import { Roles } from './const';
 import './App.css';
 
 class App extends Component {
@@ -65,7 +66,7 @@ class App extends Component {
     const allRepairs = () => true;
 
     return repairs
-      .filter(this.state.user.role === 'user' ? myRepairs : allRepairs)
+      .filter(this.state.user.role === Roles.User ? myRepairs : allRepairs)
       .map(repair => ({ ...repair, date: moment(repair.date) }))
       .sort((a, b) => a.date > b.date);
   }

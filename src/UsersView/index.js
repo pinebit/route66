@@ -9,6 +9,7 @@ import {
 import UsersFilterModal from './UsersFilterModal';
 import firebase from '../firebase';
 import { storeShape } from '../shapes';
+import { Roles } from '../const';
 
 class UsersView extends React.PureComponent {
   static DefaultFilter = {
@@ -49,7 +50,7 @@ class UsersView extends React.PureComponent {
       ...this.state,
       confirm: {
         content: `Do you want ${user.name} to become a Manager?`,
-        action: () => this.updateUser({ ...user, role: 'manager' }),
+        action: () => this.updateUser({ ...user, role: Roles.Manager }),
       },
     });
   }
@@ -113,7 +114,7 @@ class UsersView extends React.PureComponent {
           :
           <Dropdown.Item onClick={() => this.onDisable(user)}>Disable</Dropdown.Item>
         }
-        {user.role === 'user' &&
+        {user.role === Roles.User &&
           <Dropdown.Item onClick={() => this.onPromote(user)}>Promote to Manager</Dropdown.Item>
         }
       </Dropdown.Menu>
@@ -151,7 +152,7 @@ class UsersView extends React.PureComponent {
                   <Table.Cell>{user.email}</Table.Cell>
                   <Table.Cell>{user.role}</Table.Cell>
                   <Table.Cell>{user.disabled ? 'Disabled' : 'Enabled'}</Table.Cell>
-                  <Table.Cell>{user.role !== 'admin' && this.renderActions(user)}</Table.Cell>
+                  <Table.Cell>{user.role !== Roles.Admin && this.renderActions(user)}</Table.Cell>
                 </Table.Row>
               ))}
               {users.length === 0 &&

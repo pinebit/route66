@@ -7,6 +7,7 @@ import {
   Icon,
 } from 'semantic-ui-react';
 import { usersFilterShape } from '../../shapes';
+import { Roles } from '../../const';
 
 class UsersFilterModal extends React.PureComponent {
   constructor(props) {
@@ -79,9 +80,9 @@ class UsersFilterModal extends React.PureComponent {
 
   roleOptions = [
     { text: 'Any', value: '*' },
-    { text: 'Admin', value: 'admin' },
-    { text: 'Manager', value: 'manager' },
-    { text: 'User', value: 'user' },
+    { text: 'Admin', value: Roles.Admin },
+    { text: 'Manager', value: Roles.Manager },
+    { text: 'User', value: Roles.User },
   ]
 
   render() {

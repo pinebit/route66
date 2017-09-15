@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import CenteredForm from '../CenteredForm';
 import firebase from '../firebase';
 import logoIcon from '../img/logo.svg';
+import { Roles } from '../const';
 
 class SignUpForm extends React.Component {
   state = {
@@ -53,7 +54,7 @@ class SignUpForm extends React.Component {
       name: this.state.name,
       email: this.state.email,
       disabled: false,
-      role: 'user',
+      role: Roles.User,
     };
 
     return firebase.database().ref(`/users/${user.uid}`).set(userData);

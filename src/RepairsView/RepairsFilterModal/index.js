@@ -8,6 +8,7 @@ import {
 } from 'semantic-ui-react';
 import { DateRangePicker } from 'react-dates';
 import { userRecordShape, usersFilterShape } from '../../shapes';
+import { States } from '../../const';
 
 class RepairsFilterModal extends React.PureComponent {
   constructor(props) {
@@ -101,10 +102,10 @@ class RepairsFilterModal extends React.PureComponent {
 
   stateOptions = [
     { text: 'Any', value: '*' },
-    { text: 'New', value: 'new' },
-    { text: 'Assigned', value: 'assigned' },
-    { text: 'Complete', value: 'complete' },
-    { text: 'Approved', value: 'approved' },
+    { text: 'New', value: States.New },
+    { text: 'Assigned', value: States.Assigned },
+    { text: 'Complete', value: States.Complete },
+    { text: 'Approved', value: States.Approved },
   ]
 
   render() {

@@ -3,12 +3,13 @@ import { shallow } from 'enzyme';
 import { Header } from 'semantic-ui-react';
 import AppMenu from '../AppMenu';
 import MenuLink from '../AppMenu/MenuLink';
+import { Roles } from '../const';
 
 const ValidUser = {
   uid: 'abc123',
   name: 'Andrei',
   email: 'andrei.smirnov@toptal.com',
-  role: 'user',
+  role: Roles.User,
   disabled: false,
 };
 
@@ -16,7 +17,7 @@ const ValidManager = {
   uid: 'abc123',
   name: 'Andrei',
   email: 'andrei.smirnov@toptal.com',
-  role: 'manager',
+  role: Roles.Manager,
   disabled: false,
 };
 

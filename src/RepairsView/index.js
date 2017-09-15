@@ -11,6 +11,7 @@ import RepairsFilterModal from './RepairsFilterModal';
 import CommentsModal from './CommentsModal';
 import firebase from '../firebase';
 import { storeShape } from '../shapes';
+import { States, Roles } from '../const';
 
 class RepairsView extends React.PureComponent {
   static DefaultFilter = {
@@ -46,7 +47,7 @@ class RepairsView extends React.PureComponent {
       ...this.state,
       confirm: {
         content: 'Do you want to mark the repair as completed?',
-        action: () => this.updateRepair({ ...repair, state: 'complete' }),
+        action: () => this.updateRepair({ ...repair, state: States.Complete }),
       },
     });
   }
@@ -56,7 +57,7 @@ class RepairsView extends React.PureComponent {
       ...this.state,
       confirm: {
         content: 'Do you want to approve the completed repair?',
-        action: () => this.updateRepair({ ...repair, state: 'approved' }),
+        action: () => this.updateRepair({ ...repair, state: States.Approved }),
       },
     });
   }
@@ -89,7 +90,8 @@ class RepairsView extends React.PureComponent {
 
   onAddComment = (repair, comments) => {
     const newRepair = { ...repair };
-    newRepair.comments = (newRepair.comments && Array.isArray(newRepair.comments) ? newRepair.comments : []);
+    const hasComments = newRepair.comments && Array.isArray(newRepair.comments);
+    newRepair.comments = (hasComments ? newRepair.comments : []);
     newRepair.comments.push(comments);
     this.updateRepair(newRepair);
     this.onCloseComments();
@@ -148,10 +150,10 @@ class RepairsView extends React.PureComponent {
 
   renderActions = (repair) => {
     const thisUser = this.props.store.user;
-    const notUser = thisUser.role !== 'user';
+    const notUser = thisUser.role !== Roles.User;
     const myRepair = thisUser.key === repair.uid;
-    const canComplete = repair.state === 'assigned' && myRepair;
-    const canApprove = repair.state === 'complete' && notUser;
+    const canComplete = repair.state === States.Assigned && myRepair;
+    const canApprove = repair.state === States.Complete && notUser;
 
     if (!notUser && !canComplete) {
       return null;
@@ -208,7 +210,7 @@ class RepairsView extends React.PureComponent {
             onFilterChange={this.onFilterChange}
             users={this.props.store.users}
           />
-          {this.props.store.user.role !== 'user' &&
+          {this.props.store.user.role !== Roles.User &&
             <EditRepairModal
               users={this.props.store.users}
               repairs={this.props.store.repairs}
@@ -239,7 +241,7 @@ class RepairsView extends React.PureComponent {
                   <Table.Cell>{this.renderCommentsLink(repair)}</Table.Cell>
                   <Table.Cell>
                     {this.renderActions(repair)}
-                    {this.props.store.user.role !== 'user' &&
+                    {this.props.store.user.role !== Roles.User &&
                       <EditRepairModal
                         users={this.props.store.users}
                         repair={repair}
