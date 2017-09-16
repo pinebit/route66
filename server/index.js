@@ -46,5 +46,9 @@ server.listen(config.port, function () {
     require('./routes/repairs.js')(server);
 
     console.log('Server is listening on port', config.port);
+
+    server.emit('ready');
   });
 });
+
+module.exports = server; // for testing

@@ -69,5 +69,11 @@ UserSchema.methods.comparePassword = function(candidatePassword, cb) {
 UserSchema.plugin(timestamps);
 UserSchema.plugin(mongooseStringQuery);
 
-const User = mongoose.model('User', UserSchema);
+var User;
+try {
+  User = mongoose.model('User');
+} catch (error) {
+  User = mongoose.model('User', UserSchema);
+}
+
 module.exports = User;
