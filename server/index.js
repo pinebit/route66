@@ -3,6 +3,7 @@ const restify = require('restify');
 const mongoose = require('mongoose');
 const restifyPlugins = require('restify-plugins');
 const authenticate = require('./middleware/authenticate');
+const morgan = require('morgan');
 
 // Initialize Server
 const server = restify.createServer({
@@ -24,6 +25,7 @@ db.once('open', function () {
 });
 
 // Middleware
+server.use(morgan('tiny'));
 server.use(restifyPlugins.jsonBodyParser({ mapParams: true }));
 server.use(restifyPlugins.acceptParser(server.acceptable));
 server.use(restifyPlugins.queryParser({ mapParams: true }));

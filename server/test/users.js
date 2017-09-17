@@ -4,6 +4,7 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const server = require('../index');
 const should = chai.should();
+const config = require('../config');
 
 chai.use(chaiHttp);
 
@@ -28,7 +29,7 @@ function signin() {
 describe('Users', function () {
   before(function (done) { //Before each test we call GET /admin/reset
     chai.request(server)
-      .get('/admin/reset')
+      .get('/admin/reset?secret=' + config.jwt.secret)
       .end(function (err, res) {
         if (err) {
           done(err);

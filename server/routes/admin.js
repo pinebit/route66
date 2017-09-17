@@ -1,14 +1,16 @@
+const errors = require('restify-errors');
 const User = require('../models/User');
 const Repair = require('../models/Repair');
+const config = require('../config');
 
 module.exports = function (server) {
-  server.get('/admin/reset', function(req, res) {
+  server.get('/admin/reset', function(req, res, next) {
+    if (req.query.secret !== config.jwt.secret) {
+      return next(new errors.BadRequestError("Valid secret must be provided."));
+    }
+
     User.remove({}, function() {
-      console.log('User collection removed');
-
       Repair.remove({}, function() {
-        console.log('Repair collection removed');
-
         const admin = new User({
           name: 'pinebit',
           password: 'Qwerty123!',
@@ -18,12 +20,11 @@ module.exports = function (server) {
 
         admin.save(function (err) {
           if (err) {
-            console.log('Failed to create admin user.', err);
-            res.send(500);
-          } else {
-            console.log('Admin user created.');
-            res.send(200);
+            return next(new errors.InternalServerError(err));
           }
+
+          res.send(200);
+          return next();
         });
       });
     });

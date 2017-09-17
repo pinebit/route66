@@ -1,38 +1,35 @@
+const errors = require('restify-errors');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const config = require('../config');
 
 module.exports = function (server) {
-  server.post('/auth/signin', function(req, res) {
+  server.post('/auth/signin', function(req, res, next) {
 
-    // find the user
     User.findOne({
       email: req.body.email
     }, function(err, user) {
-
-      if (err) throw err;
-
-      if (!user) {
-        console.error('Authentication failed. User not found.');
-        res.send(403);
-      } else if (user) {
-
-        // check if password matches
-        user.comparePassword(req.body.password, function(err, isMatch) {
-          if (err) throw err;
-          if (!isMatch) {
-            console.log('Authentication failed. Wrong password.');
-            res.send(403);
-          } else {
-            const token = jwt.sign(user.email, config.jwt.secret);
-            res.json({ token: token });
-          }
-        });
+      if (err || !user) {
+        return next(new errors.NotFoundError(err || "User not found."));
       }
+
+      user.comparePassword(req.body.password, function(err, isMatch) {
+        if (err || !isMatch) {
+          return next(new errors.ForbiddenError("Wrong password."));
+        }
+
+        const token = jwt.sign(user.email, config.jwt.secret);
+        res.json({ token: token });
+      });
     });
   });
 
-  server.post('/auth/signup', function(req, res) {
+  server.post('/auth/signup', function(req, res, next) {
+    if (!req.body.name ||
+        !req.body.email ||
+        !req.body.password) {
+      return next(new errors.ExpectationFailedError("Expected name, email and password."));
+    }
 
     const user = new User({
       name: req.body.name,
@@ -42,10 +39,8 @@ module.exports = function (server) {
 
     user.save(function (err) {
       if (err) {
-        console.log('Failed to create user.', err);
-        res.send(500);
+        return next(new errors.InternalError(err));
       } else {
-        console.log('User has been created.');
         const token = jwt.sign(user.email, config.jwt.secret);
         res.json({ token: token });
       }

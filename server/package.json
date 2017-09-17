@@ -15,6 +15,7 @@
 		"mongoose": "4.11.8",
 		"mongoose-string-query": "0.2.5",
 		"mongoose-timestamp": "0.6.0",
+		"morgan": "^1.8.2",
 		"restify": "5.2.0",
 		"restify-errors": "5.0.0",
 		"restify-plugins": "1.6.0"

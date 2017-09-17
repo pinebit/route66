@@ -1,10 +1,20 @@
+const errors = require('restify-errors');
 const User = require('../models/User');
 
 module.exports = function (server) {
-  server.get('/users', function (req, res) {
+  server.get('/users', function (req, res, next) {
     const sendUsers = function (err, users) {
-      if (err) throw err;
-      res.send(users);
+      if (err) {
+        return next(new errors.InternalError(err));
+      }
+
+      const cleared = users.map(function (user) {
+        delete user.password;
+        return user;
+      });
+
+      res.send(cleared);
+      return next();
     };
 
     if (req._user.role === 'user') {
@@ -14,23 +24,28 @@ module.exports = function (server) {
     }
   });
 
-  server.put('/users/:user_id', function (req, res) {
+  server.put('/users/:user_id', function (req, res, next) {
     if (req._user.role === 'user' && req._user._id !== req.params.user_id) {
-      res.send(405);
+      return next(new errors.MethodNotAllowedError("Users cannot modify other users data."));
     } else {
       User.findById(req.params.user_id, function (err, user) {
-        if (err) throw err;
-        if (!user) {
-          res.send(404);
-        } else {
-          // so far we are supporting only name and role changes
-          user.name = req.body.name || user.name;
-          user.role = req.body.role || user.role;
-          user.save(function (err) {
-            if (err) throw err;
-            res.send(200);
-          })
+        if (err || !user) {
+          return next(new errors.NotFoundError());
         }
+
+        user.name = req.body.name || user.name;
+        user.role = req.body.role || user.role;
+        user.email = req.body.email || user.email;
+        user.password = req.body.password || user.password;
+
+        user.save(function (err) {
+          if (err) {
+            return next(new errors.InternalError(err));
+          }
+
+          res.send(200);
+          return next();
+        })
       })
     }
   });
