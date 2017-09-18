@@ -38,3 +38,6 @@ jspm_packages
 
 # Node.js
 node_modules
+
+# IDE
+.idea

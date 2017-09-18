@@ -49,4 +49,19 @@ module.exports = function (server) {
       })
     }
   });
+
+  server.del('/users/:user_id', function (req, res, next) {
+    if (req._user.role === 'user') {
+      return next(new errors.MethodNotAllowedError("Users cannot delete other users."));
+    } else {
+      User.remove({_id: req.params.user_id}, function (err) {
+        if (err) {
+          return next(new errors.NotFoundError());
+        }
+
+        res.send(200);
+        return next();
+      })
+    }
+  });
 };

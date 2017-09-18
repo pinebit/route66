@@ -47,7 +47,7 @@ describe('Users', function () {
   });
 
   describe('/GET users', function () {
-    it('it should GET all users', function (done) {
+    it('it should get all users', function (done) {
 
       getUsers().end(function (err, res) {
         if (err) {
@@ -93,6 +93,32 @@ describe('Users', function () {
               res.body[0].name.should.equal('master');
               done();
             });
+          });
+      });
+    });
+  });
+
+  describe('/DELETE users/:id', function () {
+    it('it should delete user', function (done) {
+
+      getUsers().end(function (err, res) {
+        if (err) {
+          done(err);
+        }
+
+        res.should.have.status(200);
+        const uid = res.body[0]._id;
+
+        chai.request(server)
+          .del('/users/' + uid)
+          .set('x-access-token', token)
+          .end(function (err, res) {
+            if (err) {
+              done(err);
+            }
+
+            res.should.have.status(200);
+            done();
           });
       });
     });
