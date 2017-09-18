@@ -3,7 +3,7 @@ const Repair = require('../models/Repair');
 
 module.exports = function (server) {
   server.get('/repairs', function (req, res, next) {
-    var query = {};
+    let query = {};
     if (req._user.role === 'user') {
       query = { user: req._user.email };
     }
@@ -59,6 +59,17 @@ module.exports = function (server) {
           return next();
         })
       }
+    });
+  });
+
+  server.del('/repairs/:repair_id', function (req, res, next) {
+    Repair.remove({_id: req.params.repair_id}, function (err) {
+      if (err) {
+        return next(new errors.InternalError(err));
+      }
+
+      res.send(200);
+      return next();
     });
   });
 };

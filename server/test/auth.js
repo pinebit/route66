@@ -8,7 +8,7 @@ const config = require('../config');
 
 chai.use(chaiHttp);
 
-var token = null;
+let token = null;
 
 function getUsers() {
   return chai.request(server)

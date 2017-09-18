@@ -8,7 +8,7 @@ const config = require('../config');
 
 chai.use(chaiHttp);
 
-var token = null;
+let token = null;
 
 function getUsers() {
   return chai.request(server)
@@ -58,6 +58,21 @@ describe('Users', function () {
         res.body.should.be.a('array');
         res.body.length.should.be.eql(1);
         res.body[0].email.should.be.eql('pinebit@gmail.com');
+        done();
+      });
+    });
+
+    it('it should obfuscate passwords', function (done) {
+
+      getUsers().end(function (err, res) {
+        if (err) {
+          done(err);
+        }
+
+        res.should.have.status(200);
+        res.body.should.be.a('array');
+        const index = res.body.findIndex(user => user.password !== undefined);
+        index.should.equal(-1);
         done();
       });
     });

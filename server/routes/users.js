@@ -9,8 +9,13 @@ module.exports = function (server) {
       }
 
       const cleared = users.map(function (user) {
-        delete user.password;
-        return user;
+        return {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          disabled: user.disabled,
+        };
       });
 
       res.send(cleared);
