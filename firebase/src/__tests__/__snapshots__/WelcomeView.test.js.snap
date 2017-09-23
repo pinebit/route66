@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<DisabledView /> renders correctly 1`] = `
+<Segment
+  padded="very"
+  piled={true}
+  textAlign="center"
+>
+  <Header
+    as="h1"
+  >
+    Welcome to ROUTE66 Car Repair Shop!
+  </Header>
+  <Message>
+    If you are the first time user, then 
+    <Link
+      replace={false}
+      to="/signup"
+    >
+      Sign Up
+    </Link>
+     to create your account. Otherwise, please 
+    <Link
+      replace={false}
+      to="/signin"
+    >
+      Sign In
+    </Link>
+     to authenticate yourself.
+  </Message>
+</Segment>
+`;

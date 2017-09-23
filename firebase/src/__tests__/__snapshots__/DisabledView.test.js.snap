@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<DisabledView /> renders correctly 1`] = `
+<Segment
+  padded="very"
+  piled={true}
+  textAlign="center"
+>
+  <Header
+    as="h2"
+    color="red"
+  >
+    Your account is disabled. Please contact any Manager to enable your account.
+  </Header>
+</Segment>
+`;

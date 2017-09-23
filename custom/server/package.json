@@ -1,0 +1,29 @@
+{
+	"name": "route66server",
+	"version": "1.0.0",
+	"description": "Simple server for route66 application",
+	"main": "index.js",
+	"scripts": {
+		"start": "nodemon index.js",
+		"test": "mocha --timeout 10000"
+	},
+	"author": "Andrei Smirnov <andrei.smirnov@toptal.com>",
+	"license": "MIT",
+	"dependencies": {
+		"bcrypt": "^1.0.3",
+		"jsonwebtoken": "8.0.1",
+		"mongoose": "4.11.8",
+		"mongoose-string-query": "0.2.5",
+		"mongoose-timestamp": "0.6.0",
+		"morgan": "^1.8.2",
+		"restify": "5.2.0",
+		"restify-cors-middleware": "^1.0.1",
+		"restify-errors": "5.0.0",
+		"restify-plugins": "1.6.0"
+	},
+	"devDependencies": {
+		"chai": "^4.1.2",
+		"chai-http": "^3.0.0",
+		"mocha": "^3.5.3"
+	}
+}
