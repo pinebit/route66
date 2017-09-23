@@ -1,5 +1,33 @@
 const errors = require('restify-errors');
 const Repair = require('../models/Repair');
+const User = require('../models/User');
+
+function convertComments(comments, users) {
+  return comments.map(function (comment) {
+    const userIndex = users.findIndex(function (user) {
+      return user._id == comment.user;
+    })
+    return {
+      date: comment.date,
+      user: comment.user,
+      displayUser: userIndex >= 0 ? users[userIndex].name : '(deleted)',
+      comment: comment.comment,
+    }
+  });
+}
+
+function convertRepairs(repairs, users) {
+  return repairs.map(function (repair) {
+    return {
+      _id: repair._id,
+      date: repair.date,
+      user: repair.user,
+      state: repair.state,
+      description: repair.description,
+      comments: convertComments(repair.comments, users)
+    }
+  });
+}
 
 module.exports = function (server) {
   server.get('/repairs', function (req, res, next) {
@@ -8,13 +36,16 @@ module.exports = function (server) {
       query = { user: req._user._id };
     }
 
-    Repair.find(query, function (err, repairs) {
-      if (err) {
-        return next(new errors.InternalError(err));
-      }
+    User.find({}, function (err, users) {
+      Repair.find(query, function (err, repairs) {
+        if (err) {
+          return next(new errors.InternalError(err));
+        }
 
-      res.send(repairs);
-      return next();
+        const cleared = convertRepairs(repairs, users);
+        res.send(cleared);
+        return next();
+      });
     });
   });
 
@@ -41,7 +72,7 @@ module.exports = function (server) {
 
       if (!repair) {
         return next(new errors.NotFoundError("Requested repair is not found."));
-      } else if (req._user.role === 'user' && repair.user !== req._user._id) {
+      } else if (req._user.role === 'user' && repair.user != req._user._id) {
         return next(new errors.MethodNotAllowedError("Users cannot modify other users repairs."));
       } else {
         repair.date = req.body.date || repair.date;

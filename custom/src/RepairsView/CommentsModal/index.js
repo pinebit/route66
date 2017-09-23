@@ -11,16 +11,9 @@ import moment from 'moment';
 import { commentRecordShape, userRecordShape } from '../../shapes';
 
 class CommentsModal extends React.PureComponent {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      comment: '',
-    };
-
-    this.userMap = new Map();
-    this.props.users.forEach(user => this.userMap.set(user._id, user.name));
-  }
+  state = {
+    comment: '',
+  };
 
   onCommentChange = (e) => {
     this.setState({
@@ -72,7 +65,7 @@ class CommentsModal extends React.PureComponent {
                 {comments.map(c => (
                   <Table.Row key={c._id}>
                     <Table.Cell collapsing>{c.date}</Table.Cell>
-                    <Table.Cell collapsing>{this.userMap.get(c.user) || '-'}</Table.Cell>
+                    <Table.Cell collapsing>{c.displayUser}</Table.Cell>
                     <Table.Cell>{c.comment}</Table.Cell>
                   </Table.Row>
                 ))}
@@ -108,7 +101,6 @@ CommentsModal.propTypes = {
   comments: PropTypes.arrayOf(commentRecordShape).isRequired,
   onAddComment: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
-  users: PropTypes.arrayOf(userRecordShape).isRequired,
   user: userRecordShape.isRequired,
 };
 

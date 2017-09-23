@@ -265,7 +265,6 @@ class RepairsView extends React.PureComponent {
           {this.state.showComments &&
             <CommentsModal
               onClose={this.onCloseComments}
-              users={this.props.users}
               user={this.props.user}
               comments={this.state.showCommentsRepair.comments || []}
               onAddComment={c => this.onAddComment(this.state.showCommentsRepair, c)}
