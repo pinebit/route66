@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const restifyPlugins = require('restify-plugins');
 const authenticate = require('./middleware/authenticate');
 const morgan = require('morgan');
-const corsMiddleware = require('restify-cors-middleware')
+const corsMiddleware = require('restify-cors-middleware');
 
 // Initialize Server
 const server = restify.createServer({

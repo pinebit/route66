@@ -20,7 +20,7 @@ import {
 class EditRepairModal extends React.PureComponent {
   static NewRepair = {
     date: moment(),
-    user: '',
+    user: null,
     description: '',
   }
 
@@ -44,12 +44,6 @@ class EditRepairModal extends React.PureComponent {
       text: `${hh}:00`,
       value: hh,
     }));
-
-    this.occupied = new Set(
-      this.props.repairs
-        .filter(r => (this.props.repair ? r.date !== this.props.repair.date : true))
-        .map(r => r.date.format()),
-    );
   }
 
   componentWillReceiveProps(nextProps) {
@@ -132,13 +126,7 @@ class EditRepairModal extends React.PureComponent {
   onSave = () => {
     const { key, ...repair } = { ...this.state.repair };
     repair.date = this.buildDateTime().format();
-
-    if (repair.user && repair.state) {
-      repair.state = repair.state === States.New ? States.Assigned : repair.state;
-    } else {
-      repair.state = States.New;
-    }
-
+    repair.state = repair.state || States.Assigned;
     repair.comments = this.addComment(repair.comments);
 
     if (this.props.repair) {
@@ -179,8 +167,16 @@ class EditRepairModal extends React.PureComponent {
   render() {
     const editing = !!this.props.repair;
     const date = this.buildDateTime().format();
-    const duplicate = this.occupied.has(date);
-    const canSave = this.state.repair.date.isValid() && this.state.repair.description && !duplicate;
+    const occupied = new Set(
+      this.props.repairs
+        .filter(r => (this.props.repair ? r.date !== this.props.repair.date : true))
+        .map(r => r.date.format()),
+    );
+    const duplicate = occupied.has(date);
+    const canSave = this.state.repair.date.isValid() &&
+      this.state.repair.description &&
+      this.state.repair.user &&
+      !duplicate;
 
     return (
       <Modal

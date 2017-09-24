@@ -3,15 +3,16 @@ const Repair = require('../models/Repair');
 const User = require('../models/User');
 
 function convertComments(comments, users) {
-  return comments.map(function (comment) {
+  return comments.map(function (comment, index) {
     const userIndex = users.findIndex(function (user) {
       return user._id == comment.user;
-    })
+    });
     return {
+      key: index,
       date: comment.date,
       user: comment.user,
       displayUser: userIndex >= 0 ? users[userIndex].name : '(deleted)',
-      comment: comment.comment,
+      comment: comment.comment
     }
   });
 }
@@ -31,7 +32,7 @@ function convertRepairs(repairs, users) {
 
 module.exports = function (server) {
   server.get('/repairs', function (req, res, next) {
-    let query = {};
+    var query = {};
     if (req._user.role === 'user') {
       query = { user: req._user._id };
     }

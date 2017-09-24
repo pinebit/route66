@@ -34,6 +34,7 @@ class CommentsModal extends React.PureComponent {
     const newComments = (comments && Array.isArray(comments)) ? comments : [];
 
     newComments.push({
+      key: newComments.length,
       date: moment().format('DD MMM YYYY h:mma'),
       user: this.props.user._id,
       comment: this.state.comment,
@@ -63,7 +64,7 @@ class CommentsModal extends React.PureComponent {
               </Table.Header>
               <Table.Body>
                 {comments.map(c => (
-                  <Table.Row key={c._id}>
+                  <Table.Row key={c.key}>
                     <Table.Cell collapsing>{c.date}</Table.Cell>
                     <Table.Cell collapsing>{c.displayUser}</Table.Cell>
                     <Table.Cell>{c.comment}</Table.Cell>

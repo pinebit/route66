@@ -14,7 +14,7 @@ module.exports = function (server) {
           name: user.name,
           email: user.email,
           role: user.role,
-          disabled: user.disabled,
+          disabled: user.disabled
         };
       });
 

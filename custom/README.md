@@ -1,6 +1,7 @@
 # ROUTE66 - Car Repair Shop
 
 This is the test project built for Toptal's react academy.
+This version is using redux, redux-saga and our custom server built with nodejs.
 
 ## Usage
 
@@ -9,9 +10,6 @@ To run the application on a dev box:
 npm install
 npm start
 ```
-
-Check it built and deployed to firebase premises:
-https://route66-ars.firebaseapp.com
 
 ## Specification
 
