@@ -11,7 +11,7 @@ There are two versions of the app (in two folders):
 2. /custom is a version using custom nodejs server that is built with restify and mongodb.
    This uses JWT tokens for authentication and mongodb cloud for the database.
 
-Both versions were bootstrapped with *create-react-app*, so to get them running just do:
+Both versions were bootstrapped with *create-react-app*, so to get them running just run:
 
 ```
 	npm install && npm start
